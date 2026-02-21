@@ -10,6 +10,11 @@ PROGRAM="$PROJECT_ROOT/cmake-build-debug/radix"
 TMPDIR="${TMPDIR:-/tmp}"
 TMP_OUT="$TMPDIR/replace_out.txt"
 
+cleanup() {
+  rm -f "$TMP_OUT" 2>/dev/null || true
+}
+trap cleanup EXIT
+
 fail() {
   echo "TEST FAILED"
   echo "==========================="
