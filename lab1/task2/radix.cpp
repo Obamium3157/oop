@@ -69,8 +69,6 @@ std::pair<std::size_t, bool> ParseSign(const std::string& str)
 
 int ParseInt(const std::string& str, const int radix)
 {
-    ValidateRadixRange(radix);
-
     const auto [startPos, negative] = ParseSign(str);
 
     constexpr int intMin = std::numeric_limits<int>::min();
@@ -91,7 +89,7 @@ int ParseInt(const std::string& str, const int radix)
         {
             if (result > (intMax - digit) / radix)
             {
-                throw std::overflow_error("overflow");
+                throw std::overflow_error("integer overflow. value exceeds INT_MAX during conversion");
             }
 
             result = result * radix + digit;
@@ -100,7 +98,7 @@ int ParseInt(const std::string& str, const int radix)
         {
             if (result < (intMin + digit) / radix)
             {
-                throw std::overflow_error("overflow");
+                throw std::overflow_error("integer overflow. value exceeds INT_MAX during conversion");
             }
 
             result = result * radix - digit;
@@ -122,18 +120,16 @@ char DigitToChar(const unsigned digit)
 
 std::string ToString(const int value, const int radix)
 {
-    ValidateRadixRange(radix);
-
     if (value == 0)
     {
         return "0";
     }
 
-    bool negative = value < 0;
+    const bool negative = value < 0;
 
     unsigned int magnitude =
         negative
-            ? static_cast<unsigned int>(-(static_cast<long long>(value)))
+            ? static_cast<unsigned int>(-static_cast<long long>(value))
             : static_cast<unsigned int>(value);
 
     std::string result;
@@ -169,7 +165,7 @@ int ParseRadix(const std::string& str)
         }
     }
 
-    const int radix = std::stoi(str);
+    const int radix = ParseInt(str, 10);
     ValidateRadixRange(radix);
 
     return radix;
@@ -195,9 +191,10 @@ int main(const int argc, char* argv[])
         std::cout << converted << '\n';
         return 0;
     }
-    catch (std::exception&)
+    catch (std::exception& e)
     {
         PrintErrorMessage();
+        std::cout << e.what() << '\n';
         return 1;
     }
 }

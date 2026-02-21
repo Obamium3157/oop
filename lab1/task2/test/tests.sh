@@ -61,3 +61,6 @@ echo "8: Wrong args"
 if "$PROGRAM" 10 2 > "$TMP_OUT" 2>&1; then fail; fi
 if ! grep -q "ERROR" "$TMP_OUT"; then fail; fi
 echo "PASSED"
+
+# TODO: выявить ограничения программы и засунуть в тесты
+# TODO: проверить граничные случаи

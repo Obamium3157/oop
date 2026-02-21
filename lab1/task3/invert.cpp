@@ -86,7 +86,7 @@ bool ReadMatrixFromStream(std::istream& input, Matrix3x3& matrix, std::string& e
             try
             {
                 size_t idx = 0;
-                double value = std::stod(tokenTrimmed, &idx);
+                const double value = std::stod(tokenTrimmed, &idx);
                 if (idx != tokenTrimmed.size())
                 {
                     errorMessage = "Invalid matrix";
