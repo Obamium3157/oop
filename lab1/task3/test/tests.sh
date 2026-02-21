@@ -68,6 +68,32 @@ cleanup
 
 # STDIN MODE
 
+info "-1: 1-Matrix"
+cat > "$TMP_IN" <<EOF
+1	1	1
+1	1	1
+1	1	1
+EOF
+
+echo "Non-invertible" > "$TMP_EXPECTED"
+
+"$PROGRAM" < "$TMP_IN" > "$TMP_OUT"
+cmp_norm || fail
+info "PASSED"
+
+info "0: 0-Matrix"
+cat > "$TMP_IN" <<EOF
+0	0	0
+0	0	0
+0	0	0
+EOF
+
+echo "Non-invertible" > "$TMP_EXPECTED"
+
+"$PROGRAM" < "$TMP_IN" > "$TMP_OUT"
+cmp_norm || fail
+info "PASSED"
+
 info "1: Example 1 (stdin)"
 cat > "$TMP_IN" <<EOF
 1	2	3

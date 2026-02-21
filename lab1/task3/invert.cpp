@@ -6,8 +6,6 @@
 #include <iomanip>
 #include <array>
 
-constexpr double EPSILON = 1e-12;
-
 using Matrix3x3 = std::array<std::array<double, 3>, 3>;
 
 std::string Trim(const std::string& text)
@@ -109,9 +107,10 @@ bool ReadMatrixFromStream(std::istream& input, Matrix3x3& matrix, std::string& e
 double ComputeDeterminant(const Matrix3x3& m)
 {
     return
-        m.at(0).at(0) * (m.at(1).at(1) * m.at(2).at(2) - m.at(1).at(2) * m.at(2).at(1)) -
-        m.at(0).at(1) * (m.at(1).at(0) * m.at(2).at(2) - m.at(1).at(2) * m.at(2).at(0)) +
-        m.at(0).at(2) * (m.at(1).at(0) * m.at(2).at(1) - m.at(1).at(1) * m.at(2).at(0));
+        m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
+        m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) +
+        m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+
 }
 
 double MinorDeterminant(const Matrix3x3& m, const int row, const int col)
@@ -139,10 +138,23 @@ double MinorDeterminant(const Matrix3x3& m, const int row, const int col)
     return vals.at(0) * vals.at(3) - vals.at(1) * vals.at(2);
 }
 
+double GetCofactor(const Matrix3x3& input, const int row, const int col)
+{
+    const double minor = MinorDeterminant(input, row, col);
+    const double sign = ((row + col) % 2 == 0) ? 1.0 : -1.0;
+
+    return sign * minor;
+}
+
+double GetInverseElement(const Matrix3x3& cofactor, const int row, const int col, const double det)
+{
+    return cofactor[col][row] / det;
+}
+
 bool InvertMatrix(const Matrix3x3& input, Matrix3x3& output)
 {
     const double det = ComputeDeterminant(input);
-    if (std::fabs(det) < EPSILON)
+    if (std::fabs(det) < std::numeric_limits<double>::epsilon())
     {
         return false;
     }
@@ -153,9 +165,7 @@ bool InvertMatrix(const Matrix3x3& input, Matrix3x3& output)
     {
         for (int j = 0; j < 3; ++j)
         {
-            const double minor = MinorDeterminant(input, i, j);
-            const double sign = ((i + j) % 2 == 0) ? 1.0 : -1.0;
-            cofactor.at(i).at(j) = sign * minor;
+            cofactor.at(i).at(j) = GetCofactor(input, i, j);
         }
     }
 
@@ -163,7 +173,7 @@ bool InvertMatrix(const Matrix3x3& input, Matrix3x3& output)
     {
         for (int j = 0; j < 3; ++j)
         {
-            output.at(i).at(j) = cofactor.at(j).at(i) / det;
+            output.at(i).at(j) = GetInverseElement(cofactor, i, j, det);
         }
     }
 
