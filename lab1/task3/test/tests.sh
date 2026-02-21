@@ -68,7 +68,6 @@ cleanup
 
 # STDIN MODE
 
-# 1
 info "1: Example 1 (stdin)"
 cat > "$TMP_IN" <<EOF
 1	2	3
@@ -86,7 +85,6 @@ EOF
 cmp_norm || fail
 info "PASSED"
 
-# 2
 info "2: Example 2 (stdin)"
 cat > "$TMP_IN" <<EOF
 4	7	2.3
@@ -104,7 +102,6 @@ EOF
 cmp_norm || fail
 info "PASSED"
 
-# 3
 info "3: Example 3 (Non-invertible)"
 cat > "$TMP_IN" <<EOF
 1	2	3
@@ -118,7 +115,6 @@ echo "Non-invertible" > "$TMP_EXPECTED"
 cmp_norm || fail
 info "PASSED"
 
-# 4
 info "4: Example 4 (Invalid matrix)"
 cat > "$TMP_IN" <<EOF
 1	2	a
@@ -134,7 +130,6 @@ info "PASSED"
 
 # NEGATIVE STDIN TESTS
 
-# 5
 info "5: Too few rows"
 printf "1\t2\t3\n" > "$TMP_IN"
 echo "Invalid matrix format" > "$TMP_EXPECTED"
@@ -143,7 +138,6 @@ echo "Invalid matrix format" > "$TMP_EXPECTED"
 cmp_norm || fail
 info "PASSED"
 
-# 6
 info "6: Too few columns"
 printf "1\t2\n3\t4\t5\n6\t7\t8\n" > "$TMP_IN"
 echo "Invalid matrix format" > "$TMP_EXPECTED"
@@ -152,7 +146,6 @@ echo "Invalid matrix format" > "$TMP_EXPECTED"
 cmp_norm || fail
 info "PASSED"
 
-# 7
 info "7: Empty input"
 : > "$TMP_IN"
 echo "Invalid matrix format" > "$TMP_EXPECTED"
@@ -163,7 +156,6 @@ info "PASSED"
 
 # FILE MODE
 
-# 8
 info "8: File mode valid"
 if [ -f "$TESTDATA/01_input.txt" ] && [ -f "$TESTDATA/01_out.txt" ]; then
   "$PROGRAM" "$TESTDATA/01_input.txt" > "$TMP_OUT"
@@ -174,14 +166,12 @@ else
   echo "8: SKIPPED (missing testdata files)"
 fi
 
-# 9
 info "9: Non-existent file"
 run_allow_fail "$PROGRAM" "$TESTDATA/no_such_file.txt" > "$TMP_OUT" 2>&1
 echo "Invalid matrix format" > "$TMP_EXPECTED"
 cmp_norm || fail
 info "PASSED"
 
-# 10
 info "10: No permission file"
 TMP_FORBIDDEN="$TMPDIR/forbidden.txt"
 echo "1	2	3" > "$TMP_FORBIDDEN"
@@ -198,7 +188,6 @@ info "PASSED"
 
 # HELP MODE
 
-# 11
 info "11: Help mode"
 run_allow_fail "$PROGRAM" -h > "$TMP_OUT" 2>&1
 if ! grep -q "Usage:" "$TMP_OUT"; then
