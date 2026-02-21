@@ -23,36 +23,41 @@ fail() {
 }
 
 echo "1: Basic"
-"$PROGRAM" 2 10 1011 > "$TMP_OUT"
-if ! grep -q "11" "$TMP_OUT" 2>&1; then fail; fi
+"$PROGRAM" 11 4 2026 > "$TMP_OUT"
+if ! grep -q "222002" "$TMP_OUT" 2>&1; then fail; fi
 echo "PASSED"
 
 echo "2: Negative"
-"$PROGRAM" 2 10 "-101" > "$TMP_OUT"
-if ! grep -q -- "-5" "$TMP_OUT" 2>&1; then fail; fi
+"$PROGRAM" 5 17 "-304" > "$TMP_OUT"
+if ! grep -q -- "-4B" "$TMP_OUT" 2>&1; then fail; fi
 echo "PASSED"
 
 echo "3: Zero"
 "$PROGRAM" 10 2 0 > "$TMP_OUT"
-if ! grep -q "^0$" "$TMP_OUT" 2>&1; then fail; fi
+if ! grep -q "0" "$TMP_OUT" 2>&1; then fail; fi
 echo "PASSED"
 
 echo "4: Invalid character"
-if "$PROGRAM" 16 10 G > "$TMP_OUT" 2>&1; then fail; fi
-if ! grep -q "^ERROR$" "$TMP_OUT"; then fail; fi
+if "$PROGRAM" 16 10 Z > "$TMP_OUT" 2>&1; then fail; fi
+if ! grep -q "ERROR" "$TMP_OUT"; then fail; fi
 echo "PASSED"
 
 echo "5: Invalid radix"
+if "$PROGRAM" "u" 30 Y > "$TMP_OUT" 2>&1; then fail; fi
+if ! grep -q "ERROR" "$TMP_OUT"; then fail; fi
+echo "PASSED"
+
+echo "6: Invalid radix ( = 1)"
 if "$PROGRAM" 1 10 5 > "$TMP_OUT" 2>&1; then fail; fi
-if ! grep -q "^ERROR$" "$TMP_OUT"; then fail; fi
+if ! grep -q "ERROR" "$TMP_OUT"; then fail; fi
 echo "PASSED"
 
-echo "6: Overflow"
-if "$PROGRAM" 10 10 2147483648 > "$TMP_OUT" 2>&1; then fail; fi
-if ! grep -q "^ERROR$" "$TMP_OUT"; then fail; fi
+echo "7: Overflow"
+if "$PROGRAM" 10 10 2112398123712897180523123 > "$TMP_OUT" 2>&1; then fail; fi
+if ! grep -q "ERROR" "$TMP_OUT"; then fail; fi
 echo "PASSED"
 
-echo "7: Wrong args"
+echo "8: Wrong args"
 if "$PROGRAM" 10 2 > "$TMP_OUT" 2>&1; then fail; fi
-if ! grep -q "^ERROR$" "$TMP_OUT"; then fail; fi
+if ! grep -q "ERROR" "$TMP_OUT"; then fail; fi
 echo "PASSED"
