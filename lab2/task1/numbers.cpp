@@ -68,10 +68,18 @@ void PrintSortedNumbers(std::vector<double> numbers)
 {
     std::sort(numbers.begin(), numbers.end());
 
+    bool isFirst = true;
+
     for (const double number : numbers)
     {
         constexpr auto PRECISION = 3;
-        std::cout << std::fixed << std::setprecision(PRECISION) << number << " ";
+        if (!isFirst)
+        {
+            std::cout << " ";
+        }
+
+        std::cout << std::fixed << std::setprecision(PRECISION) << number;
+        isFirst = false;
     }
 
     if (!numbers.empty())

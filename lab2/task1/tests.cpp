@@ -1,6 +1,8 @@
+#include <iostream>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <vector>
+#include <sstream>
 
 #include "numbers.h"
 
@@ -83,4 +85,102 @@ TEST_CASE("ProcessNumbers: single positive (it should double)")
     std::vector<double> numbers = {5.0};
     ProcessNumbers(numbers);
     REQUIRE_THAT(numbers[0], WithinAbs(10.0, kEpsilon));
+}
+
+TEST_CASE("PrintSortedNumbers: does not modify original vector")
+{
+    std::vector<double> numbers = {3.0, 1.0, 2.0};
+    const std::vector<double> original = numbers;
+    PrintSortedNumbers(numbers);
+    REQUIRE(numbers == original);
+}
+
+TEST_CASE("PrintSortedNumbers: empty vector produces no output")
+{
+    std::ostringstream output;
+    std::streambuf* oldCoutBuf = std::cout.rdbuf(output.rdbuf());
+
+    PrintSortedNumbers({});
+
+    std::cout.rdbuf(oldCoutBuf);
+    REQUIRE(output.str().empty());
+}
+
+TEST_CASE("PrintSortedNumbers: output is sorted and formatted")
+{
+    std::ostringstream output;
+    std::streambuf* oldCoutBuf = std::cout.rdbuf(output.rdbuf());
+
+    PrintSortedNumbers({3.0, 1.0, 2.5});
+
+    std::cout.rdbuf(oldCoutBuf);
+    REQUIRE(output.str() == "1.000 2.500 3.000\n");
+}
+
+TEST_CASE("ReadNumbers: valid input")
+{
+    std::istringstream input("1.0 2.5 -3.0");
+    std::streambuf* oldCinBuf = std::cin.rdbuf(input.rdbuf());
+
+    const std::vector<double> numbers = ReadNumbers();
+
+    std::cin.rdbuf(oldCinBuf);
+    REQUIRE(numbers.size() == 3);
+    REQUIRE_THAT(numbers[0], WithinAbs(1.0, kEpsilon));
+    REQUIRE_THAT(numbers[1], WithinAbs(2.5, kEpsilon));
+    REQUIRE_THAT(numbers[2], WithinAbs(-3.0, kEpsilon));
+}
+
+TEST_CASE("ReadNumbers: empty input")
+{
+    std::istringstream input("");
+    std::streambuf* oldCinBuf = std::cin.rdbuf(input.rdbuf());
+
+    const std::vector<double> numbers = ReadNumbers();
+
+    std::cin.rdbuf(oldCinBuf);
+    REQUIRE(numbers.empty());
+}
+
+TEST_CASE("ReadNumbers: invalid token throws")
+{
+    std::istringstream input("1.0 abc 3.0");
+    std::streambuf* oldCinBuf = std::cin.rdbuf(input.rdbuf());
+
+    REQUIRE_THROWS_AS(ReadNumbers(), std::invalid_argument);
+
+    std::cin.rdbuf(oldCinBuf);
+}
+
+TEST_CASE("ReadNumbers: lone minus sign throws")
+{
+    std::istringstream input("1.0 - 3.0");
+    std::streambuf* oldCinBuf = std::cin.rdbuf(input.rdbuf());
+
+    REQUIRE_THROWS_AS(ReadNumbers(), std::invalid_argument);
+
+    std::cin.rdbuf(oldCinBuf);
+}
+
+TEST_CASE("ProcessNumbers: single negative element unchanged")
+{
+    std::vector<double> numbers = {-7.0};
+    ProcessNumbers(numbers);
+    REQUIRE_THAT(numbers[0], WithinAbs(-7.0, kEpsilon));
+}
+
+TEST_CASE("ProcessNumbers: single zero element unchanged")
+{
+    std::vector<double> numbers = {0.0};
+    ProcessNumbers(numbers);
+    REQUIRE_THAT(numbers[0], WithinAbs(0.0, kEpsilon));
+}
+
+TEST_CASE("ProcessNumbers: all elements equal")
+{
+    std::vector<double> numbers = {3.0, 3.0, 3.0};
+    ProcessNumbers(numbers);
+    REQUIRE_THAT(numbers[0], WithinAbs(6.0, kEpsilon));
+    REQUIRE_THAT(numbers[1], WithinAbs(6.0, kEpsilon));
+    REQUIRE_THAT(numbers[2], WithinAbs(6.0, kEpsilon));
 }
