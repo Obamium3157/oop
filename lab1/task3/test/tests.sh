@@ -70,9 +70,9 @@ cleanup
 
 info "-1: 1-Matrix"
 cat > "$TMP_IN" <<EOF
-1	1	1
-1	1	1
-1	1	1
+1	0	0
+0	1	0
+0	0	1
 EOF
 
 echo "Non-invertible" > "$TMP_EXPECTED"
