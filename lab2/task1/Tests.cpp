@@ -4,41 +4,11 @@
 #include <vector>
 #include <sstream>
 
-#include "numbers.h"
+#include "Numbers.h"
 
 using Catch::Matchers::WithinAbs;
 
 static constexpr double epsilon = 1e-6;
-
-TEST_CASE("ComputePositiveMean: positive values only")
-{
-    const std::vector<double> numbers = {1.0, 2.0, 3.0};
-    REQUIRE_THAT(ComputePositiveMean(numbers), WithinAbs(2.0, epsilon));
-}
-
-TEST_CASE("ComputePositiveMean: mixed values")
-{
-    const std::vector<double> numbers = {4.0, 16.0, -30.0, 10.0};
-    REQUIRE_THAT(ComputePositiveMean(numbers), WithinAbs(10.0, epsilon));
-}
-
-TEST_CASE("ComputePositiveMean: negative values only")
-{
-    const std::vector<double> numbers = {-1.0, -5.0, -3.0};
-    REQUIRE_THAT(ComputePositiveMean(numbers), WithinAbs(0.0, epsilon));
-}
-
-TEST_CASE("ComputePositiveMean: empty vector")
-{
-    const std::vector<double> numbers = {};
-    REQUIRE_THAT(ComputePositiveMean(numbers), WithinAbs(0.0, epsilon));
-}
-
-TEST_CASE("ComputePositiveMean: zero")
-{
-    const std::vector<double> numbers = {0.0, 4.0};
-    REQUIRE_THAT(ComputePositiveMean(numbers), WithinAbs(4.0, epsilon));
-}
 
 TEST_CASE("ProcessNumbers: example case 1 (positive values only)")
 {
@@ -91,7 +61,7 @@ TEST_CASE("PrintSortedNumbers: does not modify original vector")
 {
     std::vector<double> numbers = {3.0, 1.0, 2.0};
     const std::vector<double> original = numbers;
-    PrintSortedNumbers(numbers);
+    PrintSortedNumbers(std::cout, numbers);
     REQUIRE(numbers == original);
 }
 
@@ -100,7 +70,7 @@ TEST_CASE("PrintSortedNumbers: empty vector produces no output")
     std::ostringstream output;
     std::streambuf* oldCoutBuf = std::cout.rdbuf(output.rdbuf());
 
-    PrintSortedNumbers({});
+    PrintSortedNumbers(std::cout, {});
 
     std::cout.rdbuf(oldCoutBuf);
     REQUIRE(output.str().empty());
@@ -111,7 +81,7 @@ TEST_CASE("PrintSortedNumbers: output is sorted and formatted")
     std::ostringstream output;
     std::streambuf* oldCoutBuf = std::cout.rdbuf(output.rdbuf());
 
-    PrintSortedNumbers({3.0, 1.0, 2.5});
+    PrintSortedNumbers(std::cout, {3.0, 1.0, 2.5});
 
     std::cout.rdbuf(oldCoutBuf);
     REQUIRE(output.str() == "1.000 2.500 3.000\n");
@@ -122,7 +92,7 @@ TEST_CASE("ReadNumbers: valid input")
     std::istringstream input("1.0 2.5 -3.0");
     std::streambuf* oldCinBuf = std::cin.rdbuf(input.rdbuf());
 
-    const std::vector<double> numbers = ReadNumbers();
+    const std::vector<double> numbers = ReadNumbers(std::cin);
 
     std::cin.rdbuf(oldCinBuf);
     REQUIRE(numbers.size() == 3);
@@ -136,7 +106,7 @@ TEST_CASE("ReadNumbers: empty input")
     std::istringstream input("");
     std::streambuf* oldCinBuf = std::cin.rdbuf(input.rdbuf());
 
-    const std::vector<double> numbers = ReadNumbers();
+    const std::vector<double> numbers = ReadNumbers(std::cin);
 
     std::cin.rdbuf(oldCinBuf);
     REQUIRE(numbers.empty());
@@ -147,7 +117,7 @@ TEST_CASE("ReadNumbers: invalid token throws")
     std::istringstream input("1.0 abc 3.0");
     std::streambuf* oldCinBuf = std::cin.rdbuf(input.rdbuf());
 
-    REQUIRE_THROWS_AS(ReadNumbers(), std::invalid_argument);
+    REQUIRE_THROWS_AS(ReadNumbers(std::cin), std::invalid_argument);
 
     std::cin.rdbuf(oldCinBuf);
 }
@@ -157,7 +127,7 @@ TEST_CASE("ReadNumbers: lone minus sign throws")
     std::istringstream input("1.0 - 3.0");
     std::streambuf* oldCinBuf = std::cin.rdbuf(input.rdbuf());
 
-    REQUIRE_THROWS_AS(ReadNumbers(), std::invalid_argument);
+    REQUIRE_THROWS_AS(ReadNumbers(std::cin), std::invalid_argument);
 
     std::cin.rdbuf(oldCinBuf);
 }

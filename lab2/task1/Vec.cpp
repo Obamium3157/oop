@@ -1,14 +1,14 @@
 #include <iostream>
 
-#include "numbers.h"
+#include "Numbers.h"
 
 int main()
 {
     try
     {
-        std::vector<double> numbers = ReadNumbers();
+        std::vector<double> numbers = ReadNumbers(std::cin);
         ProcessNumbers(numbers);
-        PrintSortedNumbers(numbers);
+        PrintSortedNumbers(std::cout, numbers);
     }
     catch (const std::invalid_argument&)
     {

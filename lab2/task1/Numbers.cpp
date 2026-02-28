@@ -6,16 +6,17 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <limits>
 
-#include "numbers.h"
+#include "Numbers.h"
 
 
-std::vector<double> ReadNumbers()
+std::vector<double> ReadNumbers(std::istream & in)
 {
     std::vector<double> numbers;
     std::string token;
 
-    while (std::cin >> token)
+    while (in >> token)
     {
         std::istringstream stream(token);
         double number;
@@ -41,7 +42,7 @@ double ComputePositiveMean(const std::vector<double> & numbers)
         numbers.begin(),
         numbers.end(),
         std::back_inserter(positiveNumbers),
-        [](const double value) { return value > 0.0; });
+        [](const double value) { return value > std::numeric_limits<double>::epsilon(); });
 
     if (positiveNumbers.empty())
     {
@@ -64,7 +65,7 @@ void ProcessNumbers(std::vector<double> & numbers)
         [positiveMean](const double value) { return value + positiveMean; });
 }
 
-void PrintSortedNumbers(std::vector<double> numbers)
+void PrintSortedNumbers(std::ostream & out, std::vector<double> numbers)
 {
     std::sort(numbers.begin(), numbers.end());
 
@@ -75,15 +76,15 @@ void PrintSortedNumbers(std::vector<double> numbers)
         constexpr auto precision = 3;
         if (!isFirst)
         {
-            std::cout << " ";
+            out << " ";
         }
 
-        std::cout << std::fixed << std::setprecision(precision) << number;
+        out << std::fixed << std::setprecision(precision) << number;
         isFirst = false;
     }
 
     if (!numbers.empty())
     {
-        std::cout << "\n";
+        out << "\n";
     }
 }
