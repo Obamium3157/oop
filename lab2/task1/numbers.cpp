@@ -72,13 +72,13 @@ void PrintSortedNumbers(std::vector<double> numbers)
 
     for (const double number : numbers)
     {
-        constexpr auto PRECISION = 3;
+        constexpr auto precision = 3;
         if (!isFirst)
         {
             std::cout << " ";
         }
 
-        std::cout << std::fixed << std::setprecision(PRECISION) << number;
+        std::cout << std::fixed << std::setprecision(precision) << number;
         isFirst = false;
     }
 
