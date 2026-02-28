@@ -3,10 +3,10 @@ project(task2)
 
 find_package(Catch2 3 REQUIRED)
 
-add_executable(decode decode.cpp
-        html.h
-        html.cpp)
+add_executable(decode Decode.cpp
+        Html.h
+        Html.cpp)
 
-add_executable(tests2 tests.cpp html.cpp)
+add_executable(tests2 Tests.cpp Html.cpp)
 
 target_link_libraries(tests2 PRIVATE Catch2::Catch2WithMain)

@@ -1,10 +1,11 @@
-#include "html.h"
+#include "Html.h"
 
 #include <unordered_map>
 
 namespace
 {
-    const std::unordered_map<std::string, char> htmlEntities = {
+    using Decoder = std::unordered_map<std::string, char>;
+    const Decoder htmlEntities = {
         {"&quot;", '"'},
         {"&apos;", '\''},
         {"&lt;",   '<'},
@@ -14,7 +15,20 @@ namespace
 
     constexpr char entityStart = '&';
     constexpr char entityEnd = ';';
-    constexpr std::size_t maxEntityLength = 6;
+
+    std::size_t maxEntityLength()
+    {
+        std::size_t max = 0;
+        for (const auto& [key, _] : htmlEntities)
+        {
+            if (key.size() > max)
+            {
+                max = key.size();
+            }
+        }
+
+        return max;
+    }
 }
 
 std::string HtmlDecode(const std::string & html)
@@ -35,7 +49,7 @@ std::string HtmlDecode(const std::string & html)
 
         const std::size_t semicolonPos = html.find(entityEnd, i + 1);
         const bool isTooFar = semicolonPos == std::string::npos
-            || semicolonPos - i + 1 > maxEntityLength;
+            || semicolonPos - i + 1 > maxEntityLength();
 
         if (isTooFar)
         {

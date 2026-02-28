@@ -1,7 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <string>
 
-#include "html.h"
+#include "Html.h"
 
 
 TEST_CASE("HtmlDecode: &quot; decodes to double quote")
