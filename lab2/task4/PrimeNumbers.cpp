@@ -1,4 +1,4 @@
-#include "prime_numbers.h"
+#include "PrimeNumbers.h"
 
 #include <vector>
 

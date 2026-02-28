@@ -1,4 +1,4 @@
-#include "word_frequency.h"
+#include "WordFrequency.h"
 
 #include <algorithm>
 #include <ostream>

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include "prime_numbers.h"
+#include "PrimeNumbers.h"
 
 int main(const int argc, char* argv[])
 {

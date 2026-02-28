@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "word_frequency.h"
+#include "WordFrequency.h"
 
 int main()
 {

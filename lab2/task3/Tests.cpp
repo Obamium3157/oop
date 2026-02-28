@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#include "word_frequency.h"
+#include "WordFrequency.h"
 
 TEST_CASE("ToLower: english lowercase is unchanged")
 {
