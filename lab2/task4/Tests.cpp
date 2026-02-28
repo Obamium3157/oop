@@ -18,6 +18,11 @@ TEST_CASE("GeneratePrimeNumbersSet: upperBound = 2 returns {2}")
     REQUIRE(GeneratePrimeNumbersSet(2) == std::set<int>{2});
 }
 
+TEST_CASE("GeneratePrimeNumbersSet: upperBound = 4 returns {2, 3}")
+{
+    REQUIRE(GeneratePrimeNumbersSet(4) == std::set<int>{2, 3});
+}
+
 TEST_CASE("GeneratePrimeNumbersSet: upperBound = 3 returns {2, 3}")
 {
     REQUIRE(GeneratePrimeNumbersSet(3) == std::set<int>{2, 3});

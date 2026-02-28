@@ -5,17 +5,17 @@
 
 #include "WordFrequency.h"
 
-TEST_CASE("ToLower: english lowercase is unchanged")
+TEST_CASE("ToLower: lowercase is unchanged")
 {
     REQUIRE(ToLower("hello") == "hello");
 }
 
-TEST_CASE("ToLower: english uppercase is lowercased")
+TEST_CASE("ToLower: uppercase is lowercased")
 {
     REQUIRE(ToLower("HELLO") == "hello");
 }
 
-TEST_CASE("ToLower: mixed english case is lowercased")
+TEST_CASE("ToLower: mixed case is lowercased")
 {
     REQUIRE(ToLower("HeLLo") == "hello");
 }

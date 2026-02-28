@@ -12,7 +12,6 @@ int main(const int argc, char* argv[])
     }
 
     int upperBound;
-
     try
     {
         upperBound = std::stoi(argv[1]);
@@ -20,12 +19,6 @@ int main(const int argc, char* argv[])
     catch (const std::exception&)
     {
         std::cout << "Error: upper bound must be an integer\n";
-        return 1;
-    }
-
-    if (upperBound < 0 || upperBound > maxUpperBound)
-    {
-        std::cout << "Error: upper bound must be between 0 and " << maxUpperBound << "\n";
         return 1;
     }
 
