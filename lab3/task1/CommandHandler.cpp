@@ -1,5 +1,7 @@
 #include "CommandHandler.h"
+
 #include <iostream>
+#include <stdexcept>
 
 CommandHandler::CommandHandler(std::istream& in, std::ostream& out, Car& car)
     : m_in(in)
@@ -7,15 +9,14 @@ CommandHandler::CommandHandler(std::istream& in, std::ostream& out, Car& car)
       , m_car(car)
       , m_commands({
           {"Info", [this](std::istream&) { Info(); }},
-          {"EngineOn", [this](std::istream&) { EngineOn(); }},
-          {"EngineOff", [this](std::istream&) { EngineOff(); }},
+          {"EngineOn", [this](std::istream&) { m_car.TurnOnEngine(); }},
+          {"EngineOff", [this](std::istream&) { m_car.TurnOffEngine(); }},
           {"SetGear", [this](std::istream& args) { SetGear(args); }},
           {"SetSpeed", [this](std::istream& args) { SetSpeed(args); }},
           {"Help", [this](std::istream&) { Help(); }},
       })
 {
 }
-
 
 void CommandHandler::Handle(const std::string& command, std::istream& args) const
 {
@@ -25,7 +26,15 @@ void CommandHandler::Handle(const std::string& command, std::istream& args) cons
         m_out << "Unknown command\n";
         return;
     }
-    it->second(args);
+
+    try
+    {
+        it->second(args);
+    }
+    catch (const std::runtime_error& e)
+    {
+        m_out << e.what() << "\n";
+    }
 }
 
 void CommandHandler::Info() const
@@ -49,22 +58,6 @@ void CommandHandler::Info() const
     m_out << "Gear: " << m_car.GetGear() << "\n";
 }
 
-void CommandHandler::EngineOn() const
-{
-    if (!m_car.TurnOnEngine())
-    {
-        m_out << "Could not turn on the engine\n";
-    }
-}
-
-void CommandHandler::EngineOff() const
-{
-    if (!m_car.TurnOffEngine())
-    {
-        m_out << "Сar must be stopped and in neutral gear\n";
-    }
-}
-
 void CommandHandler::SetGear(std::istream& args) const
 {
     int gear;
@@ -80,23 +73,7 @@ void CommandHandler::SetGear(std::istream& args) const
         return;
     }
 
-    if (!m_car.IsTurnedOn() && gear != 0)
-    {
-        m_out << "Cannot set gear while engine is off\n";
-        return;
-    }
-
-    if (!m_car.SetGear(gear))
-    {
-        if (m_car.GetSpeed() != 0 && gear == -1)
-        {
-            m_out << "Cannot reverse while moving\n";
-        }
-        else
-        {
-            m_out << "Unsuitable current speed\n";
-        }
-    }
+    m_car.SetGear(gear);
 }
 
 void CommandHandler::SetSpeed(std::istream& args) const
@@ -114,22 +91,7 @@ void CommandHandler::SetSpeed(std::istream& args) const
         return;
     }
 
-    if (!m_car.IsTurnedOn())
-    {
-        m_out << "Cannot set speed while engine is off\n";
-        return;
-    }
-
-    if (m_car.GetGear() == 0 && speed > static_cast<int>(m_car.GetSpeed()))
-    {
-        m_out << "Cannot accelerate on neutral\n";
-        return;
-    }
-
-    if (!m_car.SetSpeed(speed))
-    {
-        m_out << "Speed is out of gear range\n";
-    }
+    m_car.SetSpeed(speed);
 }
 
 void CommandHandler::Help() const

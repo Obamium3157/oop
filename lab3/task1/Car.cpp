@@ -1,5 +1,7 @@
 #include "Car.h"
 
+#include <stdexcept>
+
 Car::Car() = default;
 
 bool Car::IsTurnedOn() const
@@ -22,52 +24,57 @@ int Car::GetGear() const
     return m_gearbox.GetCurrentGear().number;
 }
 
-bool Car::TurnOnEngine()
+void Car::TurnOnEngine()
 {
     m_isTurnedOn = true;
-
-    return true;
 }
 
-bool Car::TurnOffEngine()
+void Car::TurnOffEngine()
 {
     if (!m_isTurnedOn)
     {
-        return true;
+        return;
     }
 
     const bool isNeutral = m_gearbox.GetCurrentGear().number == 0;
 
     if (!isNeutral || m_direction != Direction::Still)
     {
-        return false;
+        throw std::runtime_error("Сar must be stopped and in neutral gear");
     }
 
     m_isTurnedOn = false;
-    return true;
 }
 
 
-bool Car::SetGear(const int gear)
+void Car::SetGear(const int gear)
 {
     if (!m_isTurnedOn && gear != 0)
     {
-        return false;
+        throw std::runtime_error("Cannot set gear while engine is off");
     }
 
-    return m_gearbox.SwitchGear(gear, m_speed, m_direction);
+    if (gear == -1 && m_speed != 0)
+    {
+        throw std::runtime_error("Cannot reverse while moving");
+    }
+
+    if (!m_gearbox.SwitchGear(gear, m_speed, m_direction))
+    {
+        throw std::runtime_error("Unsuitable current speed");
+    }
 }
 
-bool Car::SetSpeed(const int speed)
+void Car::SetSpeed(const int speed)
 {
     if (speed < 0)
     {
-        return false;
+        throw std::runtime_error("Speed cannot be negative");
     }
 
     if (!m_isTurnedOn)
     {
-        return false;
+        throw std::runtime_error("Cannot set speed while engine is off");
     }
 
     const auto unsignedSpeed = static_cast<Speed>(speed);
@@ -76,12 +83,12 @@ bool Car::SetSpeed(const int speed)
 
     if (isNeutral && unsignedSpeed > m_speed)
     {
-        return false;
+        throw std::runtime_error("Cannot accelerate on neutral");
     }
 
     if (currentGear.speedRange.has_value() && !currentGear.speedRange->Contains(unsignedSpeed))
     {
-        return false;
+        throw std::runtime_error("Speed is out of gear range");
     }
 
     m_speed = unsignedSpeed;
@@ -94,6 +101,4 @@ bool Car::SetSpeed(const int speed)
     {
         m_direction = currentGear.number == -1 ? Direction::Backward : Direction::Forward;
     }
-
-    return true;
 }

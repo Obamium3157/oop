@@ -1,4 +1,7 @@
 #include <catch2/catch_test_macros.hpp>
+#include <stdexcept>
+#include <catch2/matchers/catch_matchers.hpp>
+
 #include "Car.h"
 
 // Начальное состояние
@@ -13,20 +16,20 @@ TEST_CASE("Car starts with engine off, neutral gear, zero speed and still direct
 }
 
 // Двигатель
-TEST_CASE("TurnOnEngine returns true and turns engine on")
-{
-    Car car;
-
-    REQUIRE(car.TurnOnEngine());
-    REQUIRE(car.IsTurnedOn());
-}
-
-TEST_CASE("TurnOnEngine returns true when engine is already on")
+TEST_CASE("TurnOnEngine turns engine on")
 {
     Car car;
     car.TurnOnEngine();
 
-    REQUIRE(car.TurnOnEngine());
+    REQUIRE(car.IsTurnedOn());
+}
+
+TEST_CASE("TurnOnEngine succeeds when engine is already on")
+{
+    Car car;
+    car.TurnOnEngine();
+
+    REQUIRE_NOTHROW(car.TurnOnEngine());
 }
 
 TEST_CASE("TurnOffEngine succeeds when engine is on, gear is neutral and speed is zero")
@@ -34,35 +37,35 @@ TEST_CASE("TurnOffEngine succeeds when engine is on, gear is neutral and speed i
     Car car;
     car.TurnOnEngine();
 
-    REQUIRE(car.TurnOffEngine());
+    REQUIRE_NOTHROW(car.TurnOffEngine());
     REQUIRE_FALSE(car.IsTurnedOn());
 }
 
-TEST_CASE("TurnOffEngine returns true when engine is already off")
+TEST_CASE("TurnOffEngine succeeds when engine is already off")
 {
     Car car;
 
-    REQUIRE(car.TurnOffEngine());
+    REQUIRE_NOTHROW(car.TurnOffEngine());
 }
 
-TEST_CASE("TurnOffEngine fails when speed is non-zero")
+TEST_CASE("TurnOffEngine throws when speed is non-zero")
 {
     Car car;
     car.TurnOnEngine();
     car.SetGear(1);
     car.SetSpeed(10);
 
-    REQUIRE_FALSE(car.TurnOffEngine());
+    REQUIRE_THROWS_AS(car.TurnOffEngine(), std::runtime_error);
     REQUIRE(car.IsTurnedOn());
 }
 
-TEST_CASE("TurnOffEngine fails when gear is not neutral")
+TEST_CASE("TurnOffEngine throws when gear is not neutral")
 {
     Car car;
     car.TurnOnEngine();
     car.SetGear(1);
 
-    REQUIRE_FALSE(car.TurnOffEngine());
+    REQUIRE_THROWS_WITH(car.TurnOffEngine(), "Сar must be stopped and in neutral gear");
 }
 
 // Переключение передач - базовые случаи
@@ -70,15 +73,15 @@ TEST_CASE("SetGear to neutral is allowed with engine off")
 {
     Car car;
 
-    REQUIRE(car.SetGear(0));
+    REQUIRE_NOTHROW(car.SetGear(0));
     REQUIRE(car.GetGear() == 0);
 }
 
-TEST_CASE("SetGear to non-neutral fails with engine off")
+TEST_CASE("SetGear to non-neutral throws with engine off")
 {
     Car car;
 
-    REQUIRE_FALSE(car.SetGear(1));
+    REQUIRE_THROWS_WITH(car.SetGear(1), "Cannot set gear while engine is off");
     REQUIRE(car.GetGear() == 0);
 }
 
@@ -87,17 +90,8 @@ TEST_CASE("SetGear to first gear succeeds at zero speed with engine on")
     Car car;
     car.TurnOnEngine();
 
-    REQUIRE(car.SetGear(1));
+    REQUIRE_NOTHROW(car.SetGear(1));
     REQUIRE(car.GetGear() == 1);
-}
-
-TEST_CASE("SetGear fails for out-of-range gear number")
-{
-    Car car;
-    car.TurnOnEngine();
-
-    REQUIRE_FALSE(car.SetGear(6));
-    REQUIRE_FALSE(car.SetGear(-2));
 }
 
 TEST_CASE("SetGear to same gear succeeds")
@@ -107,7 +101,7 @@ TEST_CASE("SetGear to same gear succeeds")
     car.SetGear(1);
     car.SetSpeed(15);
 
-    REQUIRE(car.SetGear(1));
+    REQUIRE_NOTHROW(car.SetGear(1));
 }
 
 // Задний ход
@@ -116,21 +110,21 @@ TEST_CASE("SetGear to reverse succeeds at zero speed")
     Car car;
     car.TurnOnEngine();
 
-    REQUIRE(car.SetGear(-1));
+    REQUIRE_NOTHROW(car.SetGear(-1));
     REQUIRE(car.GetGear() == -1);
 }
 
-TEST_CASE("SetGear to reverse fails when moving forward")
+TEST_CASE("SetGear to reverse throws when moving forward")
 {
     Car car;
     car.TurnOnEngine();
     car.SetGear(1);
     car.SetSpeed(10);
 
-    REQUIRE_FALSE(car.SetGear(-1));
+    REQUIRE_THROWS_WITH(car.SetGear(-1), "Cannot reverse while moving");
 }
 
-TEST_CASE("SetGear to forward fails when moving backward on neutral")
+TEST_CASE("SetGear to forward throws when moving backward on neutral")
 {
     Car car;
     car.TurnOnEngine();
@@ -138,7 +132,7 @@ TEST_CASE("SetGear to forward fails when moving backward on neutral")
     car.SetSpeed(10);
     car.SetGear(0);
 
-    REQUIRE_FALSE(car.SetGear(1));
+    REQUIRE_THROWS_AS(car.SetGear(1), std::runtime_error);
 }
 
 TEST_CASE("SetGear to forward succeeds after stopping from reverse")
@@ -150,18 +144,18 @@ TEST_CASE("SetGear to forward succeeds after stopping from reverse")
     car.SetGear(0);
     car.SetSpeed(0);
 
-    REQUIRE(car.SetGear(1));
+    REQUIRE_NOTHROW(car.SetGear(1));
 }
 
 // Диапазоны передач при переключении
-TEST_CASE("SetGear to second fails when speed is below its range")
+TEST_CASE("SetGear to second throws when speed is below its range")
 {
     Car car;
     car.TurnOnEngine();
     car.SetGear(1);
     car.SetSpeed(19);
 
-    REQUIRE_FALSE(car.SetGear(2));
+    REQUIRE_THROWS_WITH(car.SetGear(2), "Unsuitable current speed");
 }
 
 TEST_CASE("SetGear to second succeeds when speed is within its range")
@@ -171,7 +165,7 @@ TEST_CASE("SetGear to second succeeds when speed is within its range")
     car.SetGear(1);
     car.SetSpeed(20);
 
-    REQUIRE(car.SetGear(2));
+    REQUIRE_NOTHROW(car.SetGear(2));
 }
 
 TEST_CASE("SetGear to fifth succeeds when speed is within its range")
@@ -192,20 +186,11 @@ TEST_CASE("SetGear to fifth succeeds when speed is within its range")
 }
 
 // Установка скорости
-TEST_CASE("SetSpeed fails with engine off")
+TEST_CASE("SetSpeed throws with engine off")
 {
     Car car;
 
-    REQUIRE_FALSE(car.SetSpeed(10));
-}
-
-TEST_CASE("SetSpeed fails for negative value")
-{
-    Car car;
-    car.TurnOnEngine();
-    car.SetGear(1);
-
-    REQUIRE_FALSE(car.SetSpeed(-1));
+    REQUIRE_THROWS_WITH(car.SetSpeed(10), "Cannot set speed while engine is off");
 }
 
 TEST_CASE("SetSpeed succeeds within gear range")
@@ -214,21 +199,21 @@ TEST_CASE("SetSpeed succeeds within gear range")
     car.TurnOnEngine();
     car.SetGear(1);
 
-    REQUIRE(car.SetSpeed(15));
+    REQUIRE_NOTHROW(car.SetSpeed(15));
     REQUIRE(car.GetSpeed() == 15);
 }
 
-TEST_CASE("SetSpeed fails above gear range")
+TEST_CASE("SetSpeed throws above gear range")
 {
     Car car;
     car.TurnOnEngine();
     car.SetGear(1);
 
-    REQUIRE_FALSE(car.SetSpeed(31));
+    REQUIRE_THROWS_WITH(car.SetSpeed(31), "Speed is out of gear range");
     REQUIRE(car.GetSpeed() == 0);
 }
 
-TEST_CASE("SetSpeed fails below gear range")
+TEST_CASE("SetSpeed throws below gear range")
 {
     Car car;
     car.TurnOnEngine();
@@ -236,7 +221,7 @@ TEST_CASE("SetSpeed fails below gear range")
     car.SetSpeed(20);
     car.SetGear(2);
 
-    REQUIRE_FALSE(car.SetSpeed(10));
+    REQUIRE_THROWS_WITH(car.SetSpeed(10), "Speed is out of gear range");
 }
 
 TEST_CASE("SetSpeed on neutral can decrease speed")
@@ -247,7 +232,7 @@ TEST_CASE("SetSpeed on neutral can decrease speed")
     car.SetSpeed(30);
     car.SetGear(0);
 
-    REQUIRE(car.SetSpeed(10));
+    REQUIRE_NOTHROW(car.SetSpeed(10));
     REQUIRE(car.GetSpeed() == 10);
 }
 
@@ -259,7 +244,7 @@ TEST_CASE("SetSpeed on neutral cannot increase speed")
     car.SetSpeed(20);
     car.SetGear(0);
 
-    REQUIRE_FALSE(car.SetSpeed(21));
+    REQUIRE_THROWS_WITH(car.SetSpeed(21), "Cannot accelerate on neutral");
     REQUIRE(car.GetSpeed() == 20);
 }
 
@@ -271,7 +256,7 @@ TEST_CASE("SetSpeed on neutral to same value succeeds")
     car.SetSpeed(20);
     car.SetGear(0);
 
-    REQUIRE(car.SetSpeed(20));
+    REQUIRE_NOTHROW(car.SetSpeed(20));
 }
 
 // Направление движения

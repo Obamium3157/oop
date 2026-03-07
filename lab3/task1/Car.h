@@ -14,10 +14,10 @@ public:
     [[nodiscard]] Speed GetSpeed() const;
     [[nodiscard]] int GetGear() const;
 
-    bool TurnOnEngine();
-    bool TurnOffEngine();
-    bool SetGear(int gear);
-    bool SetSpeed(int speed);
+    void TurnOnEngine();
+    void TurnOffEngine();
+    void SetGear(int gear);
+    void SetSpeed(int speed);
 
 private:
     Gearbox m_gearbox = Gearbox();
