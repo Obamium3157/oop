@@ -17,6 +17,7 @@ public:
     Gearbox();
     [[nodiscard]] Gear GetCurrentGear() const;
     bool SwitchGear(int number, Speed currentCarSpeed, Direction currentDirection);
+
 private:
     std::vector<Gear> m_gears;
     std::size_t m_currentGearIndex;
