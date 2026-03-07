@@ -11,6 +11,8 @@ add_executable(automobile Automobile.cpp
         Speed.h
         Simulation.h
         Simulation.cpp
+        CommandHandler.h
+        CommandHandler.cpp
 )
 
 add_executable(CarTests CarTests.cpp Car.cpp Gearbox.cpp)

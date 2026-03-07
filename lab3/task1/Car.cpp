@@ -1,12 +1,6 @@
 #include "Car.h"
 
-Car::Car()
-    : m_isTurnedOn(false)
-    , m_direction(Direction::Still)
-    , m_speed(0)
-    , m_gearbox(Gearbox())
-{
-}
+Car::Car() = default;
 
 bool Car::IsTurnedOn() const
 {

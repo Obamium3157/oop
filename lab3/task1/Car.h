@@ -18,11 +18,12 @@ public:
     bool TurnOffEngine();
     bool SetGear(int gear);
     bool SetSpeed(int speed);
+
 private:
-    bool m_isTurnedOn;
-    Direction m_direction;
-    Speed m_speed;
-    Gearbox m_gearbox;
+    Gearbox m_gearbox = Gearbox();
+    Direction m_direction = Direction::Still;
+    Speed m_speed = 0;
+    bool m_isTurnedOn = false;
 };
 
 
