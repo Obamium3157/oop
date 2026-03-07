@@ -33,7 +33,7 @@ void Car::TurnOffEngine()
 {
     if (!m_isTurnedOn)
     {
-        return;
+        throw std::runtime_error("Engine must be turned on");
     }
 
     const bool isNeutral = m_gearbox.GetCurrentGear().number == 0;
