@@ -73,13 +73,7 @@ void CommandHandler::SetGear(std::istream& args) const
     int gear;
     if (!(args >> gear))
     {
-        m_out << "Invalid command argument\n";
-        return;
-    }
-
-    if (gear < -1 || gear > 5)
-    {
-        m_out << "Invalid gear\n";
+        throw std::runtime_error("Invalid command argument");
         return;
     }
 
@@ -91,14 +85,7 @@ void CommandHandler::SetSpeed(std::istream& args) const
     int speed;
     if (!(args >> speed))
     {
-        m_out << "Invalid command argument\n";
-        return;
-    }
-
-    if (speed < 0)
-    {
-        m_out << "Speed cannot be negative\n";
-        return;
+        throw std::runtime_error("Invalid command argument");
     }
 
     m_car.SetSpeed(speed);

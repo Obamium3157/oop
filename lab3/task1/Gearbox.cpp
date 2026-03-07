@@ -11,6 +11,7 @@ Gearbox::Gearbox()
           {3, SpeedRange{30, 60}},
           {4, SpeedRange{40, 90}},
           {5, SpeedRange{50, 150}},
+          {6, SpeedRange{130, 1500}},
       })
     , m_currentGearIndex(1)
 {
