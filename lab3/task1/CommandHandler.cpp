@@ -9,8 +9,8 @@ CommandHandler::CommandHandler(std::istream& in, std::ostream& out, Car& car)
       , m_car(car)
       , m_commands({
           {"Info", [this](std::istream&) { Info(); }},
-          {"EngineOn", [this](std::istream&) { m_car.TurnOnEngine(); }},
-          {"EngineOff", [this](std::istream&) { m_car.TurnOffEngine(); }},
+          {"EngineOn", [this](std::istream&) { EngineOn(); }},
+          {"EngineOff", [this](std::istream&) { EngineOff(); }},
           {"SetGear", [this](std::istream& args) { SetGear(args); }},
           {"SetSpeed", [this](std::istream& args) { SetSpeed(args); }},
           {"Help", [this](std::istream&) { Help(); }},
@@ -56,6 +56,16 @@ void CommandHandler::Info() const
     m_out << "\n";
     m_out << "Speed: " << m_car.GetSpeed() << "\n";
     m_out << "Gear: " << m_car.GetGear() << "\n";
+}
+
+void CommandHandler::EngineOn() const
+{
+    m_car.TurnOnEngine();
+}
+
+void CommandHandler::EngineOff() const
+{
+    m_car.TurnOffEngine();
 }
 
 void CommandHandler::SetGear(std::istream& args) const
