@@ -74,7 +74,6 @@ void CommandHandler::SetGear(std::istream& args) const
     if (!(args >> gear))
     {
         throw std::runtime_error("Invalid command argument");
-        return;
     }
 
     m_car.SetGear(gear);

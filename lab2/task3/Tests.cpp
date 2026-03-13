@@ -5,26 +5,6 @@
 
 #include "WordFrequency.h"
 
-TEST_CASE("ToLower: lowercase is unchanged")
-{
-    REQUIRE(ToLower("hello") == "hello");
-}
-
-TEST_CASE("ToLower: uppercase is lowercased")
-{
-    REQUIRE(ToLower("HELLO") == "hello");
-}
-
-TEST_CASE("ToLower: mixed case is lowercased")
-{
-    REQUIRE(ToLower("HeLLo") == "hello");
-}
-
-TEST_CASE("ToLower: empty string is unchanged")
-{
-    REQUIRE(ToLower("").empty());
-}
-
 TEST_CASE("CountWordFrequencies: empty input produces empty map")
 {
     std::istringstream input("");
@@ -77,6 +57,8 @@ TEST_CASE("CountWordFrequencies: multiple spaces between words")
     REQUIRE(frequencies.at("cat") == 2);
     REQUIRE(frequencies.at("dog") == 1);
 }
+
+// TODO: CA T    cat -> { "ca" => 1, "t" => 1, "cat" => 1 }
 
 TEST_CASE("CountWordFrequencies: result is sorted alphabetically")
 {

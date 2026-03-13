@@ -4,6 +4,8 @@
 #include <ostream>
 #include <string>
 
+// using FrequencyMap
+
 std::string ToLower(const std::string & word)
 {
     std::string lower = word;
