@@ -2,10 +2,10 @@
 #define OOP_VARIABLE_H
 #include <limits>
 
-#include "IIdentifier.h"
+#include "IValue.h"
 
 
-class Variable : public IIdentifier
+class Variable : public IValue
 {
 public:
     double GetValue() const override;

@@ -3,26 +3,27 @@
 #include <cmath>
 #include <utility>
 
-Function::Function(IdentifierResolver resolver,
-                   std::string leftOperand,
+Function::Function(
+                   const IValue* leftOperand,
                    const std::optional<Operation>& operation,
-                   const std::optional<std::string>& rightOperand)
-        : m_resolver(std::move(resolver))
-        , m_leftOperand(std::move(leftOperand))
+                   const IValue* rightOperand)
+        : m_leftOperand(leftOperand)
         , m_operation(operation)
         , m_rightOperand(rightOperand)
 {
 }
 
-[[nodiscard]] double Function::GetValue() const
+double Function::GetValue() const
 {
-    const auto leftValue = m_resolver(m_leftOperand);
+    const double leftValue = m_leftOperand->GetValue();
+
     if (!m_operation.has_value())
     {
         return leftValue;
     }
 
-    const auto rightValue = m_resolver(*m_rightOperand);
+    const double rightValue = m_rightOperand->GetValue();
+
     if (std::isnan(leftValue) || std::isnan(rightValue))
     {
         return std::numeric_limits<double>::quiet_NaN();
@@ -37,7 +38,7 @@ Function::Function(IdentifierResolver resolver,
     case Operation::Multiply:
         return leftValue * rightValue;
     case Operation::Divide:
-        if (rightValue == 0)
+        if (rightValue == 0.0)
         {
             return std::numeric_limits<double>::quiet_NaN();
         }

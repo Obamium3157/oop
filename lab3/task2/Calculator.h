@@ -5,7 +5,7 @@
 #include <optional>
 #include <string>
 
-#include "IIdentifier.h"
+#include "IValue.h"
 #include "Operation.h"
 
 
@@ -25,7 +25,7 @@ public:
 
 private:
     void AssignValueToVariable(const std::string& name, double value);
-    std::map<std::string, std::unique_ptr<IIdentifier>> m_identifiers = {};
+    std::map<std::string, std::unique_ptr<IValue>> m_identifiers = {};
 };
 
 

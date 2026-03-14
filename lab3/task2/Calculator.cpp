@@ -97,17 +97,12 @@ void Calculator::DeclareFunction(const std::string& name,
         throw std::runtime_error("Name does not exist");
     }
 
-    auto resolver = [this](const std::string& identifierName) -> double
-    {
-        const auto it = m_identifiers.find(identifierName);
-        if (it == m_identifiers.end())
-        {
-            return std::numeric_limits<double>::quiet_NaN();
-        }
-        return it->second->GetValue();
-    };
+    const IValue* left = m_identifiers.at(leftOperand).get();
+    const IValue* right = rightOperand
+        ? m_identifiers.at(*rightOperand).get()
+        : nullptr;
 
-    m_identifiers[name] = std::make_unique<Function>(resolver, leftOperand, operation, rightOperand);
+    m_identifiers[name] = std::make_unique<Function>(left, operation, right);
 }
 
 void Calculator::Print(std::ostream& out, const std::string& name) const

@@ -1,30 +1,25 @@
 #ifndef OOP_FUNCTION_H
 #define OOP_FUNCTION_H
 
-#include <functional>
 #include <optional>
-#include <string>
 
-#include "IIdentifier.h"
+#include "IValue.h"
 #include "Operation.h"
 
-class Function : public IIdentifier
+class Function : public IValue
 {
 public:
-    using IdentifierResolver = std::function<double(const std::string&)>;
-
-    Function(IdentifierResolver resolver,
-        std::string leftOperand,
+    Function(
+        const IValue* leftOperand,
         const std::optional<Operation>& operation,
-        const std::optional<std::string>& rightOperand);
+        const IValue* rightOperand);
 
-    [[nodiscard]] double GetValue() const override;
+    double GetValue() const override;
 
 private:
-    IdentifierResolver m_resolver;
-    std::string m_leftOperand;
+    const IValue* m_leftOperand;
     std::optional<Operation> m_operation;
-    std::optional<std::string> m_rightOperand;
+    const IValue* m_rightOperand;
 };
 
 

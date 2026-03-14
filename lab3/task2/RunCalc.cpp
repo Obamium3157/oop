@@ -4,6 +4,7 @@
 #include "Calculator.h"
 #include "CommandParser.h"
 
+// Выучить разницу между композицией и агрегацией
 int main()
 {
     Calculator calculator;

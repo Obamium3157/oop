@@ -4,7 +4,7 @@ project(task2)
 find_package(Catch2 3 REQUIRED)
 
 add_executable(calculator RunCalc.cpp
-        IIdentifier.h
+        IValue.h
         Variable.h
         Function.h
         Function.cpp
@@ -15,8 +15,8 @@ add_executable(calculator RunCalc.cpp
         CommandParser.cpp
         CommandParser.h)
 
-add_executable(VariableTests tests/VariableTests.cpp Variable.h Variable.cpp IIdentifier.h)
-add_executable(FunctionTests tests/FunctionTests.cpp Function.h Function.cpp IIdentifier.h)
+add_executable(VariableTests tests/VariableTests.cpp Variable.h Variable.cpp IValue.h)
+add_executable(FunctionTests tests/FunctionTests.cpp Function.h Function.cpp IValue.h Variable.h Variable.cpp)
 add_executable(CalculatorTests
         tests/CalculatorTests.cpp
         Calculator.h
