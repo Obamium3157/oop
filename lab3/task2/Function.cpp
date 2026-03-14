@@ -1,19 +1,20 @@
 #include "Function.h"
 
 #include <cmath>
+#include <utility>
 
-Function::Function(const IdentifierResolver& resolver,
-                   const std::string& leftOperand,
-                   const std::optional<Operation> operation,
+Function::Function(IdentifierResolver resolver,
+                   std::string leftOperand,
+                   const std::optional<Operation>& operation,
                    const std::optional<std::string>& rightOperand)
-        : m_resolver(resolver)
-        , m_leftOperand(leftOperand)
+        : m_resolver(std::move(resolver))
+        , m_leftOperand(std::move(leftOperand))
         , m_operation(operation)
         , m_rightOperand(rightOperand)
 {
 }
 
-double Function::GetValue() const
+[[nodiscard]] double Function::GetValue() const
 {
     const auto leftValue = m_resolver(m_leftOperand);
     if (!m_operation.has_value())

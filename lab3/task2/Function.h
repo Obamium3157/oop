@@ -13,12 +13,12 @@ class Function : public IIdentifier
 public:
     using IdentifierResolver = std::function<double(const std::string&)>;
 
-    Function(const IdentifierResolver& resolver,
-        const std::string& leftOperand,
-        std::optional<Operation> operation,
+    Function(IdentifierResolver resolver,
+        std::string leftOperand,
+        const std::optional<Operation>& operation,
         const std::optional<std::string>& rightOperand);
 
-    double GetValue() const override;
+    [[nodiscard]] double GetValue() const override;
 
 private:
     IdentifierResolver m_resolver;

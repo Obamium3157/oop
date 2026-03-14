@@ -6,7 +6,7 @@ class IIdentifier
 {
 public:
     virtual ~IIdentifier() = default;
-    virtual double GetValue() const = 0;
+    [[nodiscard]] virtual double GetValue() const = 0;
 };
 
 
