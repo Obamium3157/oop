@@ -9,10 +9,9 @@
 class Function : public IValue
 {
 public:
-    Function(
-        const IValue* leftOperand,
-        const std::optional<Operation>& operation,
-        const IValue* rightOperand);
+    Function(const IValue* leftOperand,
+             const std::optional<Operation>& operation,
+             const IValue* rightOperand);
 
     double GetValue() const override;
 
