@@ -127,6 +127,8 @@ void CommandParser::LetAssign(std::istream& args) const
     auto [name, value] = SplitByEqSign(line);
 
     TrimLeft(name);
+    TrimRight(name);
+    TrimLeft(value);
     TrimRight(value);
 
     if (name.empty() || value.empty())
@@ -156,6 +158,8 @@ void CommandParser::DeclareFunction(std::istream& args) const
     auto [fnName, body] = SplitByEqSign(line);
 
     TrimLeft(fnName);
+    TrimRight(fnName);
+    TrimLeft(body);
     TrimRight(body);
 
     if (fnName.empty() || body.empty())
