@@ -3,8 +3,7 @@
 #include <cmath>
 #include <utility>
 
-Function::Function(
-                   const IValue* leftOperand,
+Function::Function(const IValue* leftOperand,
                    const std::optional<Operation>& operation,
                    const IValue* rightOperand)
         : m_leftOperand(leftOperand)
