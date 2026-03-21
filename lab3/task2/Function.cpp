@@ -1,7 +1,7 @@
 #include "Function.h"
 
+#include <cassert>
 #include <cmath>
-#include <utility>
 
 Function::Function(const IValue* leftOperand,
                    const std::optional<Operation>& operation,
@@ -10,6 +10,8 @@ Function::Function(const IValue* leftOperand,
         , m_operation(operation)
         , m_rightOperand(rightOperand)
 {
+    assert(m_leftOperand != nullptr);
+    assert(m_operation.has_value() == (m_rightOperand != nullptr));
 }
 
 double Function::GetValue() const

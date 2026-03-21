@@ -184,6 +184,8 @@ void CommandParser::DeclareFunction(std::istream& args) const
     std::string rightOperand = body.substr(opPos + 1);
 
     TrimLeft(leftOperand);
+    TrimRight(leftOperand);
+    TrimLeft(rightOperand);
     TrimRight(rightOperand);
 
     if (leftOperand.empty() || rightOperand.empty())
