@@ -1,7 +1,5 @@
-cmake_minimum_required(VERSION 4.1.2)
+cmake_minimum_required(VERSION 3.20)
 project(task1)
-
-find_package(Catch2 3 REQUIRED)
 
 add_executable(automobile Automobile.cpp
         Car.h
