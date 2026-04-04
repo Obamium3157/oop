@@ -4,7 +4,19 @@ project(task3)
 add_executable(economy Economy.cpp
         Bank.h
         Bank.cpp
-        BankOperationError.h)
+        BankOperationError.h
+        IActor.h
+        Burns.cpp
+        Burns.h
+        Homer.h
+        Homer.cpp
+        Bart.cpp
+        Bart.h
+        Lisa.cpp
+        Lisa.h
+        Apu.cpp
+        Apu.h
+        Marge.cpp)
 
 add_executable(BankTests tests/TestBank.cpp Bank.h Bank.cpp BankOperationError.h)
 

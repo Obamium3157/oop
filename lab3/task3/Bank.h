@@ -38,8 +38,6 @@ public:
      * @param amount сумма перевода
      * @returns true — перевод успешный
      * @returns false — на исходном счете недостаточно средств
-     * @throws BankOperationError номера счетов невалидны
-     * @throws std::out_of_range отрицательное количество денег
      */
     [[nodiscard]] bool TrySendMoney(AccountId srcAccountId, AccountId dstAccountId, Money amount);
 
@@ -62,8 +60,6 @@ public:
 
     /**
      * @returns false — нехватка денег на счете; в этом случае количество наличных денег остается неизменным
-     * @throws BankOperationError невалидный номер аккаунта
-     * @throws std::out_of_range отрицательное количество денег
      */
     [[nodiscard]] bool TryWithdrawMoney(AccountId account, Money amount);
 

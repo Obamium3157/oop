@@ -1,33 +1,96 @@
-#include <iostream>
-
 #include "Bank.h"
+#include "Homer.h"
+#include "Marge.h"
+#include "Bart.h"
+#include "Lisa.h"
+#include "Apu.h"
+#include "Burns.h"
 
-struct Actor
+#include <iostream>
+#include <vector>
+
+namespace
 {
-    AccountId id;
-    Money balance;
-
-    void PrintData() const
+    int readIterationCount(int argc, char* argv[])
     {
-        std::cout << "ID: " << id << "\tBalance: " << balance << std::endl;
+        if (argc >= 2)
+        {
+            return std::stoi(argv[1]);
+        }
+
+        int count = 0;
+        std::cout << "Enter amount of iterations: ";
+        std::cin >> count;
+        return count;
     }
-};
 
+    void printFinalState(const std::vector<IActor*>& actors, const Bank& bank)
+    {
+        std::cout << "\n=== Final State ===\n";
 
-int main()
+        Money totalCash = 0;
+        for (const IActor* actor : actors)
+        {
+            const Money cash = actor->GetCash();
+            totalCash += cash;
+            std::cout << actor->GetName() << ": amount of cash = " << cash << "\n";
+        }
+
+        const Money bankCash = bank.GetCash();
+        std::cout << "\nCash amount according to bank data: " << bankCash << "\n";
+        std::cout << "Cash amount owned by actors: " << totalCash << "\n";
+
+        if (bankCash == totalCash)
+        {
+            std::cout << "[OK]\n";
+        }
+        else
+        {
+            std::cout << "[ERROR] Cash disperancy: " << (bankCash - totalCash) << "\n";
+        }
+    }
+}
+
+int main(int argc, char* argv[])
 {
-    Bank bank(1000);
-    auto actor1 = Actor{bank.OpenAccount(), 100};
-    auto actor2 = Actor{bank.OpenAccount(), 900};
+    const int iterations = readIterationCount(argc, argv);
 
-    actor1.PrintData();
-    actor2.PrintData();
+    constexpr Money kInitialCash = 1000;
+    Bank bank(kInitialCash);
 
-    bank.DepositMoney(actor1.id, actor1.balance / 2);
-    bank.DepositMoney(actor2.id, actor2.balance);
+    Burns burns(bank, 0);
+    Homer homer(bank, 0);
+    Marge marge(bank, 0);
+    Bart bart(0);
+    Lisa lisa(0);
+    Apu apu(bank, 0);
 
-    std::cout << bank.GetAccountBalance(actor1.id) << std::endl;
-    std::cout << bank.GetAccountBalance(actor2.id) << std::endl;
+    bank.DepositMoney(burns.GetAccountId(), kInitialCash);
 
+    burns.SetHomerAccountId(homer.GetAccountId());
+
+    homer.SetBurnsAccountId(burns.GetAccountId());
+    homer.SetMarge(&marge);
+    homer.SetBart(&bart);
+    homer.SetLisa(&lisa);
+
+    marge.SetApu(&apu);
+    bart.SetApu(&apu);
+    lisa.SetApu(&apu);
+
+    apu.SetBurnsAccountId(burns.GetAccountId());
+
+    const std::vector<IActor*> actors = {&burns, &homer, &marge, &bart, &lisa, &apu};
+
+    for (int step = 0; step < iterations; ++step)
+    {
+        std::cout << "\nStep " << (step + 1) << ":\n";
+        for (IActor* actor : actors)
+        {
+            actor->Act();
+        }
+    }
+
+    printFinalState(actors, bank);
     return 0;
 }
