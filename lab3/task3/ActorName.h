@@ -13,7 +13,7 @@ enum class ActorName
     Apu,
 };
 
-inline std::ostream& operator<<(std::ostream& os, ActorName actorName)
+inline std::ostream& operator<<(std::ostream& os, const ActorName actorName)
 {
     switch (actorName)
     {
