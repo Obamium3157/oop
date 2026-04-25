@@ -25,7 +25,8 @@ int main(int argc, char* argv[])
     try
     {
         PrintFinalState(actors, bank);
-    } catch (std::exception& e)
+    }
+    catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;
     }
