@@ -15,8 +15,8 @@ class SimulationContext
 public:
     explicit SimulationContext(Bank& bank);
 
-    [[nodiscard]] IActor* GetActor(const std::string& name) const;
-    [[nodiscard]] const std::vector<IActor*>& GetActors() const;
+    IActor* GetActor(const std::string& name) const;
+    const std::vector<IActor*>& GetActors() const;
 
 private:
     std::map<std::string, std::unique_ptr<IActor>> m_actorsByName;
