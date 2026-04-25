@@ -1,11 +1,12 @@
 #include "Burns.h"
+#include "SimulationContext.h"
 
 #include <iostream>
 
-Burns::Burns(Bank& bank, const Money initialCash)
-    : m_bank(bank)
-      , m_accountId(m_bank.OpenAccount())
-      , m_cash(initialCash)
+Burns::Burns(Bank& bank, SimulationContext& context, const Money initialCash)
+    : Bankable(bank)
+    , m_context(context)
+    , m_cash(initialCash)
 {
 }
 
@@ -16,7 +17,19 @@ void Burns::Act()
 
 void Burns::PayHomerSalary() const
 {
-    if (!m_bank.TrySendMoney(m_accountId, m_homerAccountId, kHomerSalary))
+    const IActor* homer = m_context.GetActor("Homer");
+    if (homer == nullptr)
+    {
+        return;
+    }
+
+    const auto homerAccountId = homer->GetBankAccountId();
+    if (!homerAccountId)
+    {
+        return;
+    }
+
+    if (!m_bank.TrySendMoney(m_accountId, *homerAccountId, kHomerSalary))
     {
         std::cout << m_name << ": not enough funds to pay salary to Homer.\n";
         return;
@@ -38,14 +51,4 @@ Money Burns::GetCash() const
 void Burns::ReceiveCash(const Money amount)
 {
     m_cash += amount;
-}
-
-AccountId Burns::GetAccountId() const
-{
-    return m_accountId;
-}
-
-void Burns::SetHomerAccountId(const AccountId homerAccountId)
-{
-    m_homerAccountId = homerAccountId;
 }

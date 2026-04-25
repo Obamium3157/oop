@@ -3,8 +3,9 @@
 
 #include <iostream>
 
-Lisa::Lisa(const Money initialCash)
-    : m_cash(initialCash)
+Lisa::Lisa(SimulationContext& context, const Money initialCash)
+    : m_context(context)
+    , m_cash(initialCash)
 {
 }
 
@@ -15,19 +16,20 @@ void Lisa::Act()
 
 void Lisa::SpendAtStore()
 {
-    if (m_apu == nullptr)
-    {
-        return;
-    }
-
     if (m_cash < kSpendAmount)
     {
         std::cout << m_name << ": not enough cash to purchase at Apu's.\n";
         return;
     }
 
+    IActor* apu = m_context.GetActor("Apu");
+    if (apu == nullptr)
+    {
+        return;
+    }
+
     m_cash -= kSpendAmount;
-    m_apu->ReceiveCash(kSpendAmount);
+    apu->ReceiveCash(kSpendAmount);
 
     std::cout << m_name << ": spent " << kSpendAmount << " at Apu's.\n";
 }
@@ -45,9 +47,4 @@ Money Lisa::GetCash() const
 void Lisa::ReceiveCash(const Money amount)
 {
     m_cash += amount;
-}
-
-void Lisa::SetApu(Apu* apu)
-{
-    m_apu = apu;
 }

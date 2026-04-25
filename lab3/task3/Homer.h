@@ -1,47 +1,35 @@
 #ifndef OOP_HOMER_H
 #define OOP_HOMER_H
 
+#include "Bankable.h"
 #include "IActor.h"
-#include "Marge.h"
-#include "Bart.h"
-#include "Lisa.h"
+#include "SimulationContext.h"
 
-class Homer : public IActor
+class Homer : public IActor, public Bankable
 {
 public:
-    Homer(Bank& bank, Money initialCash);
+    Homer(Bank& bank, SimulationContext& context, Money initialCash);
 
     void Act() override;
 
     const std::string& GetName() const override;
     Money GetCash() const override;
-
     void ReceiveCash(Money amount) override;
 
-    [[nodiscard]] AccountId GetAccountId() const;
-
-    void SetMarge(Marge* marge);
-    void SetBart(Bart* bart);
-    void SetLisa(Lisa* lisa);
-    void SetBurnsAccountId(AccountId burnsAccountId);
+    std::optional<AccountId> GetBankAccountId() const override { return Bankable::GetBankAccountId(); }
 
 private:
     void PayMarge() const;
     void PayElectricity() const;
-    void GiveCashToChild(IActor* child, const std::string& childName) const;
+    void GiveCashToChild(const std::string& childName) const;
 
     static constexpr Money kMargeAllowance = 50;
     static constexpr Money kElectricityBill = 30;
     static constexpr Money kChildAllowance = 10;
 
-    Bank& m_bank;
-    AccountId m_accountId;
+    SimulationContext& m_context;
     Money m_cash;
     std::string m_name = "Homer";
-
-    Marge* m_marge = nullptr;
-    Bart* m_bart = nullptr;
-    Lisa* m_lisa = nullptr;
-    AccountId m_burnsAccountId = 0;
 };
+
 #endif //OOP_HOMER_H

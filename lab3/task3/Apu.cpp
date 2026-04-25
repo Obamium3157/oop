@@ -1,10 +1,11 @@
 #include "Apu.h"
+#include "SimulationContext.h"
 
 #include <iostream>
 
-Apu::Apu(Bank& bank, const Money initialCash)
-    : m_bank(bank)
-    , m_accountId(m_bank.OpenAccount())
+Apu::Apu(Bank& bank, SimulationContext& context, const Money initialCash)
+    : Bankable(bank)
+    , m_context(context)
     , m_cash(initialCash)
 {
 }
@@ -32,13 +33,25 @@ void Apu::DepositCashToAccount()
         return;
     }
 
-    std::cout << m_name << ": deposited " << m_cash << " ammount of money.\n";
+    std::cout << m_name << ": deposited " << m_cash << " amount of money.\n";
     m_cash = 0;
 }
 
 void Apu::PayElectricity() const
 {
-    if (!m_bank.TrySendMoney(m_accountId, m_burnsAccountId, kElectricityBill))
+    const IActor* burns = m_context.GetActor("Burns");
+    if (burns == nullptr)
+    {
+        return;
+    }
+
+    const auto burnsAccountId = burns->GetBankAccountId();
+    if (!burnsAccountId)
+    {
+        return;
+    }
+
+    if (!m_bank.TrySendMoney(m_accountId, *burnsAccountId, kElectricityBill))
     {
         std::cout << m_name << ": not enough money to pay for electricity.\n";
         return;
@@ -51,23 +64,11 @@ const std::string& Apu::GetName() const
 {
     return m_name;
 }
-
 Money Apu::GetCash() const
 {
     return m_cash;
 }
-
-void Apu::ReceiveCash(Money amount)
+void Apu::ReceiveCash(const Money amount)
 {
     m_cash += amount;
-}
-
-AccountId Apu::GetAccountId() const
-{
-    return m_accountId;
-}
-
-void Apu::SetBurnsAccountId(AccountId burnsAccountId)
-{
-    m_burnsAccountId = burnsAccountId;
 }

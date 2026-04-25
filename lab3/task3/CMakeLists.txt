@@ -18,7 +18,11 @@ add_executable(economy Economy.cpp
         Apu.h
         Marge.cpp
         EconomyHelper.cpp
-        EconomyHelper.h)
+        EconomyHelper.h
+        SimulationContext.cpp
+        SimulationContext.h
+        Bankable.h
+        Bankable.cpp)
 
 add_executable(BankTests tests/TestBank.cpp Bank.h Bank.cpp BankOperationError.h)
 

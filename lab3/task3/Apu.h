@@ -1,23 +1,22 @@
 #ifndef OOP_APU_H
 #define OOP_APU_H
 
+#include "Bankable.h"
 #include "IActor.h"
+#include "SimulationContext.h"
 
-class Apu : public IActor
+class Apu : public IActor, public Bankable
 {
 public:
-    Apu(Bank& bank, Money initialCash);
+    Apu(Bank& bank, SimulationContext& context, Money initialCash);
 
     void Act() override;
 
     const std::string& GetName() const override;
     Money GetCash() const override;
-
     void ReceiveCash(Money amount) override;
 
-    [[nodiscard]] AccountId GetAccountId() const;
-
-    void SetBurnsAccountId(AccountId burnsAccountId);
+    std::optional<AccountId> GetBankAccountId() const override { return Bankable::GetBankAccountId(); }
 
 private:
     void DepositCashToAccount();
@@ -25,12 +24,9 @@ private:
 
     static constexpr Money kElectricityBill = 25;
 
-    Bank& m_bank;
-    AccountId m_accountId;
+    SimulationContext& m_context;
     Money m_cash;
     std::string m_name = "Apu";
-
-    AccountId m_burnsAccountId = 0;
 };
 
 #endif //OOP_APU_H

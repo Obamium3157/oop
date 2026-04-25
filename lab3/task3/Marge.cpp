@@ -1,11 +1,11 @@
 #include "Marge.h"
-#include "Apu.h"
+#include "SimulationContext.h"
 
 #include <iostream>
 
-Marge::Marge(Bank& bank, const Money initialCash)
-    : m_bank(bank)
-    , m_accountId(m_bank.OpenAccount())
+Marge::Marge(Bank& bank, SimulationContext& context, const Money initialCash)
+    : Bankable(bank)
+    , m_context(context)
     , m_cash(initialCash)
 {
 }
@@ -17,12 +17,20 @@ void Marge::Act()
 
 void Marge::BuyGroceries() const
 {
-    if (m_apu == nullptr)
+    const IActor* apu = m_context.GetActor("Apu");
+    if (apu == nullptr)
     {
         return;
     }
 
-    if (!m_bank.TrySendMoney(m_accountId, m_apu->GetAccountId(), kGroceryCost))
+    const auto apuAccountId = apu->GetBankAccountId();
+    if (!apuAccountId)
+    {
+        std::cout << m_name << ": Apu has no bank account.\n";
+        return;
+    }
+
+    if (!m_bank.TrySendMoney(m_accountId, *apuAccountId, kGroceryCost))
     {
         std::cout << m_name << ": not enough funds to buy groceries at Apu's.\n";
         return;
@@ -44,14 +52,4 @@ Money Marge::GetCash() const
 void Marge::ReceiveCash(const Money amount)
 {
     m_cash += amount;
-}
-
-AccountId Marge::GetAccountId() const
-{
-    return m_accountId;
-}
-
-void Marge::SetApu(Apu* apu)
-{
-    m_apu = apu;
 }

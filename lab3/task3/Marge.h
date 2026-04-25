@@ -1,36 +1,30 @@
 #ifndef OOP_MARGE_H
 #define OOP_MARGE_H
 
+#include "Bankable.h"
 #include "IActor.h"
-#include "Apu.h"
+#include "SimulationContext.h"
 
-class Marge : public IActor
+class Marge : public IActor, public Bankable
 {
 public:
-    Marge(Bank& bank, Money initialCash);
+    Marge(Bank& bank, SimulationContext& context, Money initialCash);
 
     void Act() override;
 
     const std::string& GetName() const override;
     Money GetCash() const override;
-
     void ReceiveCash(Money amount) override;
 
-    [[nodiscard]] AccountId GetAccountId() const;
-
-    void SetApu(Apu* apu);
+    std::optional<AccountId> GetBankAccountId() const override { return Bankable::GetBankAccountId(); }
 
 private:
     void BuyGroceries() const;
 
     static constexpr Money kGroceryCost = 40;
 
-    Bank& m_bank;
-    AccountId m_accountId;
+    SimulationContext& m_context;
     Money m_cash;
     std::string m_name = "Marge";
-
-    Apu* m_apu = nullptr;
-
 };
 #endif //OOP_MARGE_H

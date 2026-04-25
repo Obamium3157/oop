@@ -1,6 +1,7 @@
 #ifndef OOP_IACTOR_H
 #define OOP_IACTOR_H
 
+#include <optional>
 #include <string>
 #include "Bank.h"
 
@@ -13,9 +14,9 @@ public:
 
     virtual const std::string& GetName() const = 0;
     virtual Money GetCash() const = 0;
-
     virtual void ReceiveCash(Money amount) = 0;
-};
 
+    virtual std::optional<AccountId> GetBankAccountId() const { return std::nullopt; }
+};
 
 #endif //OOP_IACTOR_H

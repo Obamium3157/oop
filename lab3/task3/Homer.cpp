@@ -1,13 +1,11 @@
 #include "Homer.h"
-#include "Marge.h"
-#include "Bart.h"
-#include "Lisa.h"
+#include "SimulationContext.h"
 
 #include <iostream>
 
-Homer::Homer(Bank& bank, const Money initialCash)
-    : m_bank(bank)
-    , m_accountId(m_bank.OpenAccount())
+Homer::Homer(Bank& bank, SimulationContext& context, const Money initialCash)
+    : Bankable(bank)
+    , m_context(context)
     , m_cash(initialCash)
 {
 }
@@ -16,18 +14,25 @@ void Homer::Act()
 {
     PayMarge();
     PayElectricity();
-    GiveCashToChild(m_bart, "Bart");
-    GiveCashToChild(m_lisa, "Lisa");
+    GiveCashToChild("Bart");
+    GiveCashToChild("Lisa");
 }
 
 void Homer::PayMarge() const
 {
-    if (m_marge == nullptr)
+    const IActor* marge = m_context.GetActor("Marge");
+    if (marge == nullptr)
     {
         return;
     }
 
-    if (!m_bank.TrySendMoney(m_accountId, m_marge->GetAccountId(), kMargeAllowance))
+    const auto margeAccountId = marge->GetBankAccountId();
+    if (!margeAccountId)
+    {
+        return;
+    }
+
+    if (!m_bank.TrySendMoney(m_accountId, *margeAccountId, kMargeAllowance))
     {
         std::cout << m_name << ": not enough money to pay to Marge.\n";
         return;
@@ -38,7 +43,19 @@ void Homer::PayMarge() const
 
 void Homer::PayElectricity() const
 {
-    if (!m_bank.TrySendMoney(m_accountId, m_burnsAccountId, kElectricityBill))
+    const IActor* burns = m_context.GetActor("Burns");
+    if (burns == nullptr)
+    {
+        return;
+    }
+
+    const auto burnsAccountId = burns->GetBankAccountId();
+    if (!burnsAccountId)
+    {
+        return;
+    }
+
+    if (!m_bank.TrySendMoney(m_accountId, *burnsAccountId, kElectricityBill))
     {
         std::cout << m_name << ": not enough funds to pay for electricity.\n";
         return;
@@ -47,8 +64,9 @@ void Homer::PayElectricity() const
     std::cout << m_name << ": payed " << kElectricityBill << " for electricity.\n";
 }
 
-void Homer::GiveCashToChild(IActor* child, const std::string& childName) const
+void Homer::GiveCashToChild(const std::string& childName) const
 {
+    IActor* child = m_context.GetActor(childName);
     if (child == nullptr)
     {
         return;
@@ -78,29 +96,4 @@ Money Homer::GetCash() const
 void Homer::ReceiveCash(const Money amount)
 {
     m_cash += amount;
-}
-
-AccountId Homer::GetAccountId() const
-{
-    return m_accountId;
-}
-
-void Homer::SetMarge(Marge* marge)
-{
-    m_marge = marge;
-}
-
-void Homer::SetBart(Bart* bart)
-{
-    m_bart = bart;
-}
-
-void Homer::SetLisa(Lisa* lisa)
-{
-    m_lisa = lisa;
-}
-
-void Homer::SetBurnsAccountId(const AccountId burnsAccountId)
-{
-    m_burnsAccountId = burnsAccountId;
 }

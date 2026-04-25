@@ -1,10 +1,11 @@
 #include "Bart.h"
-#include "Apu.h"
+#include "SimulationContext.h"
 
 #include <iostream>
 
-Bart::Bart(const Money initialCash)
-    : m_cash(initialCash)
+Bart::Bart(SimulationContext& context, const Money initialCash)
+    : m_context(context)
+    , m_cash(initialCash)
 {
 }
 
@@ -15,19 +16,20 @@ void Bart::Act()
 
 void Bart::SpendAtStore()
 {
-    if (m_apu == nullptr)
-    {
-        return;
-    }
-
     if (m_cash < kSpendAmount)
     {
         std::cout << m_name << ": not enough cash to purchase at Apu's.\n";
         return;
     }
 
+    IActor* apu = m_context.GetActor("Apu");
+    if (apu == nullptr)
+    {
+        return;
+    }
+
     m_cash -= kSpendAmount;
-    m_apu->ReceiveCash(kSpendAmount);
+    apu->ReceiveCash(kSpendAmount);
 
     std::cout << m_name << ": spent " << kSpendAmount << " amount of cash at Apu's.\n";
 }
@@ -45,9 +47,4 @@ Money Bart::GetCash() const
 void Bart::ReceiveCash(const Money amount)
 {
     m_cash += amount;
-}
-
-void Bart::SetApu(Apu* apu)
-{
-    m_apu = apu;
 }
