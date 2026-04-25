@@ -3,7 +3,8 @@
 
 #include "Bankable.h"
 #include "IActor.h"
-#include "SimulationContext.h"
+
+class SimulationContext;
 
 class Homer : public IActor, public Bankable
 {
@@ -12,16 +13,16 @@ public:
 
     void Act() override;
 
-    const std::string& GetName() const override;
+    const ActorName GetName() const override;
     Money GetCash() const override;
     void ReceiveCash(Money amount) override;
 
-    std::optional<AccountId> GetBankAccountId() const override { return Bankable::GetBankAccountId(); }
+    std::optional<AccountId> GetBankAccountId() const override;
 
 private:
     void PayMarge() const;
     void PayElectricity() const;
-    void GiveCashToChild(const std::string& childName) const;
+    void GiveCashToChild(ActorName childName) const;
 
     static constexpr Money kMargeAllowance = 50;
     static constexpr Money kElectricityBill = 30;
@@ -29,7 +30,7 @@ private:
 
     SimulationContext& m_context;
     Money m_cash;
-    std::string m_name = "Homer";
+    ActorName m_name = ActorName::Homer;
 };
 
 #endif //OOP_HOMER_H

@@ -1,9 +1,9 @@
 #ifndef OOP_SIMULATIONCONTEXT_H
 #define OOP_SIMULATIONCONTEXT_H
 
-#include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "IActor.h"
@@ -15,11 +15,13 @@ class SimulationContext
 public:
     explicit SimulationContext(Bank& bank);
 
-    IActor* GetActor(const std::string& name) const;
+
+    IActor* GetActor(ActorName name) const;
     const std::vector<IActor*>& GetActors() const;
+    void Iterate() const;
 
 private:
-    std::map<std::string, std::unique_ptr<IActor>> m_actorsByName;
+    std::unordered_map<ActorName, std::unique_ptr<IActor>> m_actorsByName;
     std::vector<IActor*> m_actors;
 };
 

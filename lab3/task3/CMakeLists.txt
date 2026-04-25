@@ -22,9 +22,11 @@ add_executable(economy Economy.cpp
         SimulationContext.cpp
         SimulationContext.h
         Bankable.h
-        Bankable.cpp)
+        Bankable.cpp
+        ActorName.h)
 
-add_executable(BankTests tests/TestBank.cpp Bank.h Bank.cpp BankOperationError.h)
+add_executable(BankTests tests/TestBank.cpp Bank.h Bank.cpp BankOperationError.h
+        ActorName.h)
 add_executable(SimulationTests tests/TestSimulation.cpp
         Bank.h
         Bank.cpp
@@ -46,7 +48,8 @@ add_executable(SimulationTests tests/TestSimulation.cpp
         SimulationContext.cpp
         SimulationContext.h
         Bankable.h
-        Bankable.cpp)
+        Bankable.cpp
+        ActorName.h)
 
 target_link_libraries(BankTests PRIVATE Catch2::Catch2WithMain)
 target_link_libraries(SimulationTests PRIVATE Catch2::Catch2WithMain)

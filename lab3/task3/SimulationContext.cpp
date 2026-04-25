@@ -23,11 +23,11 @@ SimulationContext::SimulationContext(Bank& bank)
     createAndRegister(std::make_unique<Lisa>(*this, 0));
     createAndRegister(std::make_unique<Apu>(bank, *this, 0));
 
-    const auto burnsAccountId = m_actorsByName.at("Burns")->GetBankAccountId();
+    const auto burnsAccountId = m_actorsByName.at(ActorName::Burns)->GetBankAccountId();
     bank.DepositMoney(*burnsAccountId, 1000);
 }
 
-IActor* SimulationContext::GetActor(const std::string& name) const
+IActor* SimulationContext::GetActor(const ActorName name) const
 {
     const auto it = m_actorsByName.find(name);
     if (it == m_actorsByName.end())
@@ -40,4 +40,12 @@ IActor* SimulationContext::GetActor(const std::string& name) const
 const std::vector<IActor*>& SimulationContext::GetActors() const
 {
     return m_actors;
+}
+
+void SimulationContext::Iterate() const
+{
+    for (const auto actors = GetActors(); const auto& actor : actors)
+    {
+        actor->Act();
+    }
 }

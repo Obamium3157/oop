@@ -22,7 +22,7 @@ void Lisa::SpendAtStore()
         return;
     }
 
-    IActor* apu = m_context.GetActor("Apu");
+    IActor* apu = m_context.GetActor(ActorName::Apu);
     if (apu == nullptr)
     {
         return;
@@ -34,7 +34,7 @@ void Lisa::SpendAtStore()
     std::cout << m_name << ": spent " << kSpendAmount << " at Apu's.\n";
 }
 
-const std::string& Lisa::GetName() const
+const ActorName Lisa::GetName() const
 {
     return m_name;
 }

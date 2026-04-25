@@ -13,11 +13,11 @@ public:
 
     void Act() override;
 
-    const std::string& GetName() const override;
+    const ActorName GetName() const override;
     Money GetCash() const override;
     void ReceiveCash(Money amount) override;
 
-    std::optional<AccountId> GetBankAccountId() const override { return Bankable::GetBankAccountId(); }
+    std::optional<AccountId> GetBankAccountId() const override;
 
 private:
     void PayHomerSalary() const;
@@ -26,7 +26,7 @@ private:
 
     SimulationContext& m_context;
     Money m_cash;
-    std::string m_name = "Burns";
+    ActorName m_name = ActorName::Burns;
 };
 
 #endif //OOP_BURNS_H

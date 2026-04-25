@@ -1,7 +1,7 @@
 #include "Burns.h"
-#include "SimulationContext.h"
-
 #include <iostream>
+
+class SimulationContext;
 
 Burns::Burns(Bank& bank, SimulationContext& context, const Money initialCash)
     : Bankable(bank)
@@ -17,7 +17,7 @@ void Burns::Act()
 
 void Burns::PayHomerSalary() const
 {
-    const IActor* homer = m_context.GetActor("Homer");
+    const IActor* homer = m_context.GetActor(ActorName::Homer);
     if (homer == nullptr)
     {
         return;
@@ -38,7 +38,7 @@ void Burns::PayHomerSalary() const
     std::cout << m_name << ": payed " << kHomerSalary << " salary to Homer.\n";
 }
 
-const std::string& Burns::GetName() const
+const ActorName Burns::GetName() const
 {
     return m_name;
 }
@@ -51,4 +51,9 @@ Money Burns::GetCash() const
 void Burns::ReceiveCash(const Money amount)
 {
     m_cash += amount;
+}
+
+std::optional<AccountId> Burns::GetBankAccountId() const
+{
+    return Bankable::GetBankAccountId();
 }

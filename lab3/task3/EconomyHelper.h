@@ -5,7 +5,8 @@
 
 #include <vector>
 
-int readIterationCount(int argc, char* argv[]);
-void printFinalState(const std::vector<IActor*>& actors, const Bank& bank);
+int ReadIterationCount(int argc, char* argv[]);
+void PrintFinalState(const std::vector<IActor*>& actors, const Bank& bank);
+void AssertFinalState(const std::vector<IActor*>& actors, const Bank& bank);
 
 #endif //OOP_ECONOMYHELPER_H

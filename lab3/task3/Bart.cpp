@@ -22,7 +22,7 @@ void Bart::SpendAtStore()
         return;
     }
 
-    IActor* apu = m_context.GetActor("Apu");
+    IActor* apu = m_context.GetActor(ActorName::Apu);
     if (apu == nullptr)
     {
         return;
@@ -34,7 +34,7 @@ void Bart::SpendAtStore()
     std::cout << m_name << ": spent " << kSpendAmount << " amount of cash at Apu's.\n";
 }
 
-const std::string& Bart::GetName() const
+const ActorName Bart::GetName() const
 {
     return m_name;
 }

@@ -12,11 +12,11 @@ public:
 
     void Act() override;
 
-    const std::string& GetName() const override;
+    const ActorName GetName() const override;
     Money GetCash() const override;
     void ReceiveCash(Money amount) override;
 
-    std::optional<AccountId> GetBankAccountId() const override { return Bankable::GetBankAccountId(); }
+    std::optional<AccountId> GetBankAccountId() const override;
 
 private:
     void DepositCashToAccount();
@@ -26,7 +26,7 @@ private:
 
     SimulationContext& m_context;
     Money m_cash;
-    std::string m_name = "Apu";
+    ActorName m_name = ActorName::Apu;
 };
 
 #endif //OOP_APU_H

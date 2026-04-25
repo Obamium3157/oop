@@ -19,19 +19,13 @@ TEST_CASE("Тесты симуляции", "[Simulation][Run]")
 
         auto runSimulation = [&]()
         {
-            for (int step = 0; step < iterations; ++step)
-            {
-                for (IActor* actor : actors)
-                {
-                    actor->Act();
-                }
-            }
+            context.Iterate();
         };
 
         REQUIRE_NOTHROW(runSimulation());
 
         REQUIRE(bank.GetCash() >= 0);
 
-        REQUIRE_NOTHROW(printFinalState(actors, bank));
+        REQUIRE_NOTHROW(AssertFinalState(actors, bank));
     }
 }

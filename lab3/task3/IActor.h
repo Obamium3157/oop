@@ -2,7 +2,8 @@
 #define OOP_IACTOR_H
 
 #include <optional>
-#include <string>
+
+#include "ActorName.h"
 #include "Bank.h"
 
 class IActor
@@ -12,7 +13,7 @@ public:
 
     virtual void Act() = 0;
 
-    virtual const std::string& GetName() const = 0;
+    virtual const ActorName GetName() const = 0;
     virtual Money GetCash() const = 0;
     virtual void ReceiveCash(Money amount) = 0;
 

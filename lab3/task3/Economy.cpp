@@ -6,7 +6,7 @@
 
 int main(int argc, char* argv[])
 {
-    const int iterations = readIterationCount(argc, argv);
+    const int iterations = ReadIterationCount(argc, argv);
 
     constexpr Money kInitialCash = 1000;
     Bank bank(kInitialCash);
@@ -24,7 +24,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        printFinalState(actors, bank);
+        PrintFinalState(actors, bank);
     } catch (std::exception& e)
     {
         std::cout << e.what() << std::endl;

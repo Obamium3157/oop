@@ -14,13 +14,13 @@ void Homer::Act()
 {
     PayMarge();
     PayElectricity();
-    GiveCashToChild("Bart");
-    GiveCashToChild("Lisa");
+    GiveCashToChild(ActorName::Bart);
+    GiveCashToChild(ActorName::Lisa);
 }
 
 void Homer::PayMarge() const
 {
-    const IActor* marge = m_context.GetActor("Marge");
+    const IActor* marge = m_context.GetActor(ActorName::Marge);
     if (marge == nullptr)
     {
         return;
@@ -43,7 +43,7 @@ void Homer::PayMarge() const
 
 void Homer::PayElectricity() const
 {
-    const IActor* burns = m_context.GetActor("Burns");
+    const IActor* burns = m_context.GetActor(ActorName::Burns);
     if (burns == nullptr)
     {
         return;
@@ -64,7 +64,7 @@ void Homer::PayElectricity() const
     std::cout << m_name << ": payed " << kElectricityBill << " for electricity.\n";
 }
 
-void Homer::GiveCashToChild(const std::string& childName) const
+void Homer::GiveCashToChild(const ActorName childName) const
 {
     IActor* child = m_context.GetActor(childName);
     if (child == nullptr)
@@ -83,7 +83,7 @@ void Homer::GiveCashToChild(const std::string& childName) const
     std::cout << m_name << ": gave " << kChildAllowance << " amount of cash to " << childName << ".\n";
 }
 
-const std::string& Homer::GetName() const
+const ActorName Homer::GetName() const
 {
     return m_name;
 }
@@ -96,4 +96,9 @@ Money Homer::GetCash() const
 void Homer::ReceiveCash(const Money amount)
 {
     m_cash += amount;
+}
+
+std::optional<AccountId> Homer::GetBankAccountId() const
+{
+    return Bankable::GetBankAccountId();
 }

@@ -2,7 +2,8 @@
 #define OOP_BART_H
 
 #include "IActor.h"
-#include "SimulationContext.h"
+
+class SimulationContext;
 
 class Bart : public IActor
 {
@@ -11,7 +12,7 @@ public:
 
     void Act() override;
 
-    const std::string& GetName() const override;
+    const ActorName GetName() const override;
     Money GetCash() const override;
     void ReceiveCash(Money amount) override;
 
@@ -22,7 +23,7 @@ private:
 
     SimulationContext& m_context;
     Money m_cash;
-    std::string m_name = "Bart";
+    ActorName m_name = ActorName::Bart;
 };
 
 #endif //OOP_BART_H

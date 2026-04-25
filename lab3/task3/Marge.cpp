@@ -17,7 +17,7 @@ void Marge::Act()
 
 void Marge::BuyGroceries() const
 {
-    const IActor* apu = m_context.GetActor("Apu");
+    const IActor* apu = m_context.GetActor(ActorName::Apu);
     if (apu == nullptr)
     {
         return;
@@ -39,7 +39,7 @@ void Marge::BuyGroceries() const
     std::cout << m_name << ": payed " << kGroceryCost << " for groceries at Apu's.\n";
 }
 
-const std::string& Marge::GetName() const
+const ActorName Marge::GetName() const
 {
     return m_name;
 }
@@ -52,4 +52,9 @@ Money Marge::GetCash() const
 void Marge::ReceiveCash(const Money amount)
 {
     m_cash += amount;
+}
+
+std::optional<AccountId> Marge::GetBankAccountId() const
+{
+    return Bankable::GetBankAccountId();
 }

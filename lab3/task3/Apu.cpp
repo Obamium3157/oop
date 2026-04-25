@@ -16,6 +16,11 @@ void Apu::Act()
     PayElectricity();
 }
 
+std::optional<AccountId> Apu::GetBankAccountId() const
+{
+    return Bankable::GetBankAccountId();
+}
+
 void Apu::DepositCashToAccount()
 {
     if (m_cash == 0)
@@ -39,7 +44,7 @@ void Apu::DepositCashToAccount()
 
 void Apu::PayElectricity() const
 {
-    const IActor* burns = m_context.GetActor("Burns");
+    const IActor* burns = m_context.GetActor(ActorName::Burns);
     if (burns == nullptr)
     {
         return;
@@ -60,7 +65,7 @@ void Apu::PayElectricity() const
     std::cout << m_name << ": payed " << kElectricityBill << " for electricity.\n";
 }
 
-const std::string& Apu::GetName() const
+const ActorName Apu::GetName() const
 {
     return m_name;
 }

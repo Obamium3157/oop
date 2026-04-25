@@ -7,11 +7,35 @@
 #include "Bank.h"
 #include "IActor.h"
 
+namespace
+{
+    Money CalculateTotalCash(const std::vector<IActor*>& actors)
+    {
+        Money totalCash = 0;
+        for (const IActor* actor : actors)
+        {
+            const Money cash = actor->GetCash();
+            totalCash += cash;
+        }
 
-class Bank;
-class IActor;
+        return totalCash;
+    }
 
-int readIterationCount(int argc, char* argv[])
+    void PrintActorCash(const IActor* actor)
+    {
+        std::cout << actor->GetName() << ": amount of cash = " << actor->GetCash() << "\n";
+    }
+
+    void PrintActorsCash(const std::vector<IActor*>& actors)
+    {
+        for (const IActor* actor : actors)
+        {
+            PrintActorCash(actor);
+        }
+    }
+}
+
+int ReadIterationCount(int argc, char* argv[])
 {
     if (argc >= 2)
     {
@@ -24,28 +48,34 @@ int readIterationCount(int argc, char* argv[])
     return count;
 }
 
-void printFinalState(const std::vector<IActor*>& actors, const Bank& bank)
+void AssertFinalState(const std::vector<IActor*>& actors, const Bank& bank)
 {
-    std::cout << "\n=== Final State ===\n";
-
-    Money totalCash = 0;
-    for (const IActor* actor : actors)
-    {
-        const Money cash = actor->GetCash();
-        totalCash += cash;
-        std::cout << actor->GetName() << ": amount of cash = " << cash << "\n";
-    }
+    const Money totalCash = CalculateTotalCash(actors);
+    PrintActorsCash(actors);
 
     const Money bankCash = bank.GetCash();
     std::cout << "\nCash amount according to bank data: " << bankCash << "\n";
     std::cout << "Cash amount owned by actors: " << totalCash << "\n";
 
-    if (bankCash == totalCash)
-    {
-        std::cout << "[OK]\n";
-    }
-    else
+    if (bankCash != totalCash)
     {
         throw BankOperationError(std::format("[ERROR] Cash discrepancy: {}", bankCash - totalCash));
     }
+}
+
+void PrintFinalState(const std::vector<IActor*>& actors, const Bank& bank)
+{
+    std::cout << "\n=== Final State ===\n";
+
+    try
+    {
+        AssertFinalState(actors, bank);
+    }
+    catch (std::exception& e)
+    {
+        std::cout << e.what() << "\n";
+        return;
+    }
+
+    std::cout << "[OK]\n";
 }
