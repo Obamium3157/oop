@@ -16,10 +16,7 @@ int main(int argc, char* argv[])
     for (int step = 0; step < iterations; ++step)
     {
         std::cout << "\nStep " << (step + 1) << ":\n";
-        for (IActor* actor : actors)
-        {
-            actor->Act();
-        }
+        context.Iterate();
     }
 
     try
