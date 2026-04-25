@@ -46,6 +46,6 @@ void printFinalState(const std::vector<IActor*>& actors, const Bank& bank)
     }
     else
     {
-        std::cout << "[ERROR] Cash discrepancy: " << (bankCash - totalCash) << "\n";
+        throw BankOperationError(std::format("[ERROR] Cash discrepancy: {}", bankCash - totalCash));
     }
 }

@@ -22,6 +22,13 @@ int main(int argc, char* argv[])
         }
     }
 
-    printFinalState(actors, bank);
+    try
+    {
+        printFinalState(actors, bank);
+    } catch (std::exception& e)
+    {
+        std::cout << e.what() << std::endl;
+    }
+
     return 0;
 }

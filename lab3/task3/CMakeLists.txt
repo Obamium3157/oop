@@ -25,5 +25,28 @@ add_executable(economy Economy.cpp
         Bankable.cpp)
 
 add_executable(BankTests tests/TestBank.cpp Bank.h Bank.cpp BankOperationError.h)
+add_executable(SimulationTests tests/TestSimulation.cpp
+        Bank.h
+        Bank.cpp
+        BankOperationError.h
+        IActor.h
+        Burns.cpp
+        Burns.h
+        Homer.h
+        Homer.cpp
+        Bart.cpp
+        Bart.h
+        Lisa.cpp
+        Lisa.h
+        Apu.cpp
+        Apu.h
+        Marge.cpp
+        EconomyHelper.cpp
+        EconomyHelper.h
+        SimulationContext.cpp
+        SimulationContext.h
+        Bankable.h
+        Bankable.cpp)
 
 target_link_libraries(BankTests PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(SimulationTests PRIVATE Catch2::Catch2WithMain)
