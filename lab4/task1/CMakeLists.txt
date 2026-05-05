@@ -15,7 +15,11 @@ add_executable(Geometry Geometry.cpp
         CParallelepiped.cpp
         CParallelepiped.h
         CCompound.cpp
-        CCompound.h)
+        CCompound.h
+        BodyCollection.cpp
+        BodyCollection.h
+        ConsoleHandler.cpp
+        ConsoleHandler.h)
 
 add_executable(GeometryTests tests/GeometryTests.cpp
         CBody.cpp
