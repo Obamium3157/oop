@@ -1,102 +1,123 @@
 #include "CDate.h"
 #include <iomanip>
+#include <limits>
+#include <utility>
 
-const unsigned CDate::MaxValidTimestamp = ComputeTimestamp(31, Month::DECEMBER, MaxYear);
-const unsigned CDate::GregorianCycleDays = GregorianCycleYears * 365 + CountLeapYearsUpTo(GregorianCycleYears);
-
-bool CDate::IsLeapYear(const unsigned year)
+namespace
 {
-    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-}
+    bool IsLeapYear(unsigned year);
+    unsigned DaysInMonth(Month month, unsigned year);
+    unsigned CountLeapYearsUpTo(unsigned year);
+    unsigned DaysToStartOfYear(unsigned year);
+    unsigned ComputeTimestamp(unsigned day, Month month, unsigned year);
+    bool IsDateValid(unsigned day, Month month, unsigned year);
+    constexpr WeekDay WeekDayFromTimestamp(unsigned timestamp);
+    unsigned YearsFromDays(unsigned days);
+    unsigned YearFromTimestamp(unsigned timestamp);
+    std::pair<Month, unsigned> ExtractMonthAndDay(unsigned timestamp);
 
-unsigned CDate::DaysInMonth(Month month, const unsigned year)
-{
-    const unsigned daysPerMonth[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    if (month == Month::FEBRUARY && IsLeapYear(year))
+    constexpr unsigned MinYear = 1970;
+    constexpr unsigned MaxYear = 9999;
+    const unsigned MaxValidTimestamp = ComputeTimestamp(31, Month::DECEMBER, MaxYear);
+    constexpr unsigned InvalidTimestamp = std::numeric_limits<unsigned>::max();
+    constexpr unsigned GregorianCycleYears = 400;
+    const unsigned GregorianCycleDays = GregorianCycleYears * 365 + CountLeapYearsUpTo(GregorianCycleYears);
+
+    bool IsLeapYear(const unsigned year)
     {
-        return 29;
-    }
-    return daysPerMonth[static_cast<unsigned>(month)];
-}
-
-unsigned CDate::CountLeapYearsUpTo(const unsigned year)
-{
-    return year / 4 - year / 100 + year / 400;
-}
-
-unsigned CDate::DaysToStartOfYear(const unsigned year)
-{
-    return (year - MinYear) * 365
-        + CountLeapYearsUpTo(year - 1)
-        - CountLeapYearsUpTo(MinYear - 1);
-}
-
-unsigned CDate::ComputeTimestamp(const unsigned day, Month month, const unsigned year)
-{
-    auto timestamp = DaysToStartOfYear(year);
-    const auto monthIndex = static_cast<unsigned>(month);
-    for (unsigned i = 1; i < monthIndex; ++i)
-    {
-        timestamp += DaysInMonth(static_cast<Month>(i), year);
-    }
-    return timestamp + day - 1;
-}
-
-bool CDate::IsDateValid(const unsigned day, Month month, const unsigned year)
-{
-    if (year < MinYear || year > MaxYear)
-    {
-        return false;
+        return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
     }
 
-    if (const auto monthIndex = static_cast<unsigned>(month); monthIndex < 1 || monthIndex > 12)
+    unsigned DaysInMonth(Month month, const unsigned year)
     {
-        return false;
-    }
-    return day >= 1 && day <= DaysInMonth(month, year);
-}
-
-unsigned CDate::YearsFromDays(const unsigned days)
-{
-    return static_cast<unsigned>(
-        static_cast<unsigned long long>(days) * GregorianCycleYears / GregorianCycleDays);
-}
-
-constexpr WeekDay CDate::WeekDayFromTimestamp(const unsigned timestamp)
-{
-    constexpr unsigned daysInWeek = 7;
-    constexpr unsigned epochWeekDayOffset = 4;
-
-    return static_cast<WeekDay>((timestamp + epochWeekDayOffset) % daysInWeek);
-}
-
-unsigned CDate::YearFromTimestamp(const unsigned timestamp)
-{
-    unsigned year = MinYear + YearsFromDays(timestamp);
-
-    if (DaysToStartOfYear(year + 1) <= timestamp)
-    {
-        ++year;
-    }
-
-    return year;
-}
-
-std::pair<Month, unsigned> CDate::ExtractMonthAndDay(const unsigned timestamp)
-{
-    const unsigned year = YearFromTimestamp(timestamp);
-    unsigned remaining = timestamp - DaysToStartOfYear(year);
-
-    for (unsigned i = 1; i <= 12; ++i)
-    {
-        const unsigned daysInCurrentMonth = DaysInMonth(static_cast<Month>(i), year);
-        if (remaining < daysInCurrentMonth)
+        const unsigned daysPerMonth[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+        if (month == Month::FEBRUARY && IsLeapYear(year))
         {
-            return {static_cast<Month>(i), remaining + 1};
+            return 29;
         }
-        remaining -= daysInCurrentMonth;
+        return daysPerMonth[static_cast<unsigned>(month)];
     }
-    return {Month::DECEMBER, 31};
+
+    unsigned CountLeapYearsUpTo(const unsigned year)
+    {
+        return year / 4 - year / 100 + year / 400;
+    }
+
+    unsigned DaysToStartOfYear(const unsigned year)
+    {
+        return (year - MinYear) * 365
+            + CountLeapYearsUpTo(year - 1)
+            - CountLeapYearsUpTo(MinYear - 1);
+    }
+
+    unsigned ComputeTimestamp(const unsigned day, Month month, const unsigned year)
+    {
+        auto timestamp = DaysToStartOfYear(year);
+        const auto monthIndex = static_cast<unsigned>(month);
+        for (unsigned i = 1; i < monthIndex; ++i)
+        {
+            timestamp += DaysInMonth(static_cast<Month>(i), year);
+        }
+        return timestamp + day - 1;
+    }
+
+    bool IsDateValid(const unsigned day, Month month, const unsigned year)
+    {
+        if (year < MinYear || year > MaxYear)
+        {
+            return false;
+        }
+
+        if (const auto monthIndex = static_cast<unsigned>(month); monthIndex < 1 || monthIndex > 12)
+        {
+            return false;
+        }
+        return day >= 1 && day <= DaysInMonth(month, year);
+    }
+
+    constexpr WeekDay WeekDayFromTimestamp(const unsigned timestamp)
+    {
+        constexpr unsigned daysInWeek = 7;
+        constexpr unsigned epochWeekDayOffset = 4;
+
+        return static_cast<WeekDay>((timestamp + epochWeekDayOffset) % daysInWeek);
+    }
+
+    unsigned YearsFromDays(const unsigned days)
+    {
+        return static_cast<unsigned>(
+            static_cast<unsigned long long>(days) * GregorianCycleYears / GregorianCycleDays);
+    }
+
+    unsigned YearFromTimestamp(const unsigned timestamp)
+    {
+        unsigned year = MinYear + YearsFromDays(timestamp);
+
+        if (DaysToStartOfYear(year + 1) <= timestamp)
+        {
+            ++year;
+        }
+
+        return year;
+    }
+
+    // TODO: придумать, как сделать без цикла
+    std::pair<Month, unsigned> ExtractMonthAndDay(const unsigned timestamp)
+    {
+        const unsigned year = YearFromTimestamp(timestamp);
+        unsigned remaining = timestamp - DaysToStartOfYear(year);
+
+        for (unsigned i = 1; i <= 12; ++i)
+        {
+            const unsigned daysInCurrentMonth = DaysInMonth(static_cast<Month>(i), year);
+            if (remaining < daysInCurrentMonth)
+            {
+                return {static_cast<Month>(i), remaining + 1};
+            }
+            remaining -= daysInCurrentMonth;
+        }
+        return {Month::DECEMBER, 31};
+    }
 }
 
 CDate::CDate(const unsigned day, const Month month, const unsigned year)
@@ -295,7 +316,7 @@ std::istream& operator>>(std::istream& is, CDate& date)
         is >> token;
         if (token == "INVALID")
         {
-            date = CDate(CDate::InvalidTimestamp);
+            date = CDate(InvalidTimestamp);
         }
         else
         {

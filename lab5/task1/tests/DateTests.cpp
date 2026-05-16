@@ -2,6 +2,9 @@
 #include <sstream>
 #include "../CDate.h"
 
+// TODO: умножить число тестов на 2 (сделать одинаковые тесты для валидного и невалидного состояния)
+// TODO: добавить тесты для невалидной даты
+
 TEST_CASE("Default constructor creates 01.01.1970", "[constructor]")
 {
     const CDate date;
@@ -78,6 +81,7 @@ TEST_CASE("Leap years", "[leap]")
 {
     SECTION("29.02.2000 is valid (leap year)")
     {
+        // TODO: проверить, что вычисление високосного года не имеет погрешности на +- 1
         CDate date(29, Month::FEBRUARY, 2000);
         REQUIRE(date.IsValid());
         CHECK(date.GetDay() == 29);

@@ -3,8 +3,6 @@
 
 #include <compare>
 #include <iosfwd>
-#include <limits>
-#include <utility>
 
 enum class Month
 {
@@ -47,26 +45,7 @@ public:
     friend std::istream& operator>>(std::istream& is, CDate& date);
 
 private:
-    static const unsigned MaxValidTimestamp;
-
-    static constexpr unsigned InvalidTimestamp = std::numeric_limits<unsigned>::max();
-    static constexpr unsigned MinYear = 1970;
-    static constexpr unsigned MaxYear = 9999;
-    static constexpr unsigned GregorianCycleYears = 400;
-    static const unsigned GregorianCycleDays;
-
     unsigned m_timestamp;
-
-    static bool IsLeapYear(unsigned year);
-    static unsigned DaysInMonth(Month month, unsigned year);
-    static unsigned CountLeapYearsUpTo(unsigned year);
-    static unsigned DaysToStartOfYear(unsigned year);
-    static unsigned ComputeTimestamp(unsigned day, Month month, unsigned year);
-    static bool IsDateValid(unsigned day, Month month, unsigned year);
-    static constexpr WeekDay WeekDayFromTimestamp(unsigned timestamp);
-    static unsigned YearsFromDays(unsigned days);
-    static unsigned YearFromTimestamp(unsigned timestamp);
-    static std::pair<Month, unsigned> ExtractMonthAndDay(unsigned timestamp);
 };
 
 
