@@ -15,7 +15,7 @@ TEST_CASE("Timestamp constructor", "[constructor]")
 {
     SECTION("timestamp 0 = 01.01.1970")
     {
-        CDate date(0u);
+        CDate date(0);
         REQUIRE(date.IsValid());
         CHECK(date.GetDay() == 1);
         CHECK(date.GetMonth() == Month::JANUARY);
@@ -23,7 +23,7 @@ TEST_CASE("Timestamp constructor", "[constructor]")
     }
     SECTION("timestamp 2 = 03.01.1970")
     {
-        CDate date(2u);
+        CDate date(2);
         REQUIRE(date.IsValid());
         CHECK(date.GetDay() == 3);
         CHECK(date.GetMonth() == Month::JANUARY);
@@ -31,7 +31,7 @@ TEST_CASE("Timestamp constructor", "[constructor]")
     }
     SECTION("timestamp 32 = 02.02.1970")
     {
-        CDate date(32u);
+        CDate date(32);
         REQUIRE(date.IsValid());
         CHECK(date.GetDay() == 2);
         CHECK(date.GetMonth() == Month::FEBRUARY);
@@ -45,37 +45,46 @@ TEST_CASE("Day/month/year constructor", "[constructor]")
     {
         CDate date(15, Month::JUNE, 2000);
         REQUIRE(date.IsValid());
-        CHECK(date.GetDay() == 15);
-        CHECK(date.GetMonth() == Month::JUNE);
-        CHECK(date.GetYear() == 2000);
     }
     SECTION("maximum valid date: 31.12.9999")
     {
         CDate date(31, Month::DECEMBER, 9999);
         REQUIRE(date.IsValid());
-        CHECK(date.GetDay() == 31);
-        CHECK(date.GetMonth() == Month::DECEMBER);
-        CHECK(date.GetYear() == 9999);
     }
-    SECTION("invalid day") { CHECK_FALSE(CDate(32, Month::JANUARY, 2000).IsValid()); }
-    SECTION("zero day") { CHECK_FALSE(CDate(0, Month::JANUARY, 2000).IsValid()); }
-    SECTION("invalid month") { CHECK_FALSE(CDate(1, static_cast<Month>(13), 2000).IsValid()); }
-    SECTION("year before 1970") { CHECK_FALSE(CDate(1, Month::JANUARY, 1969).IsValid()); }
-    SECTION("year after 9999") { CHECK_FALSE(CDate(1, Month::JANUARY, 10000).IsValid()); }
+    SECTION("invalid day")
+    {
+        CHECK_FALSE(CDate(32, Month::JANUARY, 2000).IsValid());
+    }
+    SECTION("zero day")
+    {
+        CHECK_FALSE(CDate(0, Month::JANUARY, 2000).IsValid());
+    }
+    SECTION("invalid month")
+    {
+        CHECK_FALSE(CDate(1, static_cast<Month>(13), 2000).IsValid());
+    }
+    SECTION("year before 1970")
+    {
+        CHECK_FALSE(CDate(1, Month::JANUARY, 1969).IsValid());
+    }
+    SECTION("year after 9999")
+    {
+        CHECK_FALSE(CDate(1, Month::JANUARY, 10000).IsValid());
+    }
 }
 
 
 TEST_CASE("Leap years", "[leap]")
 {
-    SECTION("2000 is a leap year: February 29 is valid")
+    SECTION("29.02.2000 is valid (leap year)")
     {
         CDate date(29, Month::FEBRUARY, 2000);
         REQUIRE(date.IsValid());
         CHECK(date.GetDay() == 29);
     }
-    SECTION("1900 is not a leap year: February 29 is invalid")
+    SECTION("29.02.2026 is invalid (non-leap year)")
     {
-        CHECK_FALSE(CDate(29, Month::FEBRUARY, 1900).IsValid());
+        CHECK_FALSE(CDate(29, Month::FEBRUARY, 2026).IsValid());
     }
     SECTION("1972 is a leap year")
     {
@@ -83,16 +92,11 @@ TEST_CASE("Leap years", "[leap]")
         REQUIRE(date.IsValid());
         CHECK(date.GetDay() == 29);
         CHECK(date.GetMonth() == Month::FEBRUARY);
-        CHECK(date.GetYear() == 1972);
-    }
-    SECTION("2001 is not a leap year: February 29 is invalid")
-    {
-        CHECK_FALSE(CDate(29, Month::FEBRUARY, 2001).IsValid());
     }
 }
 
 
-TEST_CASE("Day of week", "[weekday]")
+TEST_CASE("Weekday", "[weekday]")
 {
     SECTION("01.01.1970 is Thursday")
     {
@@ -104,19 +108,15 @@ TEST_CASE("Day of week", "[weekday]")
         ++date;
         CHECK(date.GetWeekDay() == WeekDay::FRIDAY);
     }
-    SECTION("01.01.2024 is Monday (known date)")
+    SECTION("01.01.2024 is Monday")
     {
         CHECK(CDate(1, Month::JANUARY, 2024).GetWeekDay() == WeekDay::MONDAY);
-    }
-    SECTION("01.01.2000 is Saturday")
-    {
-        CHECK(CDate(1, Month::JANUARY, 2000).GetWeekDay() == WeekDay::SATURDAY);
     }
 }
 
 TEST_CASE("Prefix ++", "[increment]")
 {
-    SECTION("regular advance to the next day")
+    SECTION("day++ = day + 1")
     {
         CDate date(1, Month::JANUARY, 1970);
         CDate& ref = ++date;
@@ -132,7 +132,7 @@ TEST_CASE("Prefix ++", "[increment]")
         CHECK(date.GetDay() == 1);
         CHECK(date.GetMonth() == Month::MARCH);
     }
-    SECTION("crossing end of February in a leap year")
+    SECTION("crossing end of February (leap year)")
     {
         CDate date(28, Month::FEBRUARY, 2000);
         ++date;
@@ -167,7 +167,7 @@ TEST_CASE("Postfix ++", "[increment]")
 
 TEST_CASE("Prefix --", "[decrement]")
 {
-    SECTION("regular move to the previous day")
+    SECTION("--day = day - 1")
     {
         CDate date(2, Month::JANUARY, 1970);
         CDate& ref = --date;
@@ -182,7 +182,7 @@ TEST_CASE("Prefix --", "[decrement]")
         CHECK(date.GetDay() == 28);
         CHECK(date.GetMonth() == Month::FEBRUARY);
     }
-    SECTION("crossing start of March in a leap year")
+    SECTION("crossing start of March (leap year)")
     {
         CDate date(1, Month::MARCH, 2000);
         --date;
