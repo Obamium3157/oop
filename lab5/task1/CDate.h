@@ -63,8 +63,8 @@ private:
     static unsigned DaysToStartOfYear(unsigned year);
     static unsigned ComputeTimestamp(unsigned day, Month month, unsigned year);
     static bool IsDateValid(unsigned day, Month month, unsigned year);
-    static unsigned YearsFromDays(unsigned days);
     static constexpr WeekDay WeekDayFromTimestamp(unsigned timestamp);
+    static unsigned YearsFromDays(unsigned days);
     static unsigned YearFromTimestamp(unsigned timestamp);
     static std::pair<Month, unsigned> ExtractMonthAndDay(unsigned timestamp);
 };

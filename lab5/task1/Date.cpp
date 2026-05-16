@@ -6,7 +6,8 @@ int main()
 {
     CDate date;
     std::cin >> date;
-    std::cout << date << std::endl;
-    std::cout << date++ << std::endl;
-    std::cout << date + 500 << std::endl;
+    std::cout << "Date: " << date << std::endl;
+    std::cout << "Date++: " << date++ << std::endl;
+    std::cout << "++Date: " << ++date << std::endl;
+    std::cout << "Date + 500: " << date + 500 << std::endl;
 }
