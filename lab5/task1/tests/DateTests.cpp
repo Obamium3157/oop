@@ -116,11 +116,11 @@ TEST_CASE("Weekday", "[weekday]")
 
 TEST_CASE("Prefix ++", "[increment]")
 {
-    SECTION("day++ = day + 1")
+    SECTION("day++ = day + 1", "[increment]")
     {
-        CDate date(1, Month::JANUARY, 1970);
-        CDate& ref = ++date;
-        CHECK(&ref == &date);
+        CDate date;
+        CDate other = ++date;
+        CHECK(other == date);
         CHECK(date.GetDay() == 2);
         CHECK(date.GetMonth() == Month::JANUARY);
         CHECK(date.GetYear() == 1970);
@@ -170,8 +170,8 @@ TEST_CASE("Prefix --", "[decrement]")
     SECTION("--day = day - 1")
     {
         CDate date(2, Month::JANUARY, 1970);
-        CDate& ref = --date;
-        CHECK(&ref == &date);
+        CDate other = --date;
+        CHECK(other == date);
         CHECK(date.GetDay() == 1);
         CHECK(date.GetMonth() == Month::JANUARY);
     }
