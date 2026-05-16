@@ -2,7 +2,7 @@
 #include <iomanip>
 
 const unsigned CDate::MaxValidTimestamp = ComputeTimestamp(31, Month::DECEMBER, MaxYear);
-const unsigned CDate::GregorianCycleDays = GregorianCycleYears * 365u + CountLeapYearsUpTo(GregorianCycleYears);
+const unsigned CDate::GregorianCycleDays = GregorianCycleYears * 365 + CountLeapYearsUpTo(GregorianCycleYears);
 
 bool CDate::IsLeapYear(const unsigned year)
 {
@@ -64,8 +64,8 @@ unsigned CDate::YearsFromDays(const unsigned days)
 
 constexpr WeekDay CDate::WeekDayFromTimestamp(const unsigned timestamp)
 {
-    constexpr unsigned daysInWeek = 7u;
-    constexpr unsigned epochWeekDayOffset = 4u;
+    constexpr unsigned daysInWeek = 7;
+    constexpr unsigned epochWeekDayOffset = 4;
 
     return static_cast<WeekDay>((timestamp + epochWeekDayOffset) % daysInWeek);
 }

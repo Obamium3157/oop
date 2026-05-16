@@ -50,9 +50,9 @@ private:
     static const unsigned MaxValidTimestamp;
 
     static constexpr unsigned InvalidTimestamp = std::numeric_limits<unsigned>::max();
-    static constexpr unsigned MinYear = 1970u;
-    static constexpr unsigned MaxYear = 9999u;
-    static constexpr unsigned GregorianCycleYears = 400u;
+    static constexpr unsigned MinYear = 1970;
+    static constexpr unsigned MaxYear = 9999;
+    static constexpr unsigned GregorianCycleYears = 400;
     static const unsigned GregorianCycleDays;
 
     unsigned m_timestamp;
