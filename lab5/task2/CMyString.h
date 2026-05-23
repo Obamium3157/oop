@@ -36,9 +36,6 @@ public:
     friend bool operator==(const CMyString& lhs, const CMyString& rhs);
     friend std::strong_ordering operator<=>(CMyString const& lhs, CMyString const& rhs);
 
-    friend std::ostream& operator<<(std::ostream& stream, CMyString const& str);
-    friend std::istream& operator>>(std::istream& stream, CMyString& str);
-
 private:
     static inline char s_emptyBuffer[1] = { '\0' };
 
@@ -46,9 +43,12 @@ private:
     size_t m_length;
     size_t m_capacity;
 
-    bool IsUsingStaticBuffer() const noexcept;
+    bool IsEmpty() const noexcept;
     void Reallocate(size_t newCapacity);
 };
+
+std::ostream& operator<<(std::ostream& stream, CMyString const& str);
+std::istream& operator>>(std::istream& stream, CMyString& str);
 
 
 #endif //OOP_CSTRING_H

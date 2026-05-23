@@ -15,6 +15,7 @@ CMyString::CMyString(const char* pString)
     , m_length(0)
     , m_capacity(0)
 {
+    // TODO: эта строка много где дублируется
     if (pString == nullptr)
     {
         throw std::invalid_argument("CMyString: pString must be non-null");
@@ -43,6 +44,7 @@ CMyString::CMyString(const char* pString, const size_t length)
     m_length = length;
     m_capacity = length;
 
+    // TODO: посмотреть, кидает ли исключения
     std::memcpy(m_data, pString, length);
     m_data[length] = '\0';
 }
@@ -69,7 +71,7 @@ CMyString::CMyString(std::string const& stlString)
 
 CMyString::~CMyString()
 {
-    if (!IsUsingStaticBuffer())
+    if (!IsEmpty())
     {
         delete[] m_data;
     }
@@ -106,7 +108,7 @@ CMyString CMyString::SubString(const size_t start, const size_t length) const
 
 void CMyString::Clear()
 {
-    if (!IsUsingStaticBuffer())
+    if (!IsEmpty())
     {
         delete[] m_data;
     }
@@ -139,7 +141,7 @@ CMyString& CMyString::operator=(CMyString&& other) noexcept
         return *this;
     }
 
-    if (!IsUsingStaticBuffer())
+    if (!IsEmpty())
     {
         delete[] m_data;
     }
@@ -243,7 +245,7 @@ std::strong_ordering operator<=>(CMyString const& lhs, CMyString const& rhs)
 
 std::ostream& operator<<(std::ostream& stream, CMyString const& str)
 {
-    stream.write(str.m_data, static_cast<std::streamsize>(str.m_length));
+    stream.write(str.GetStringData(), static_cast<std::streamsize>(str.GetLength()));
     return stream;
 }
 
@@ -261,7 +263,7 @@ std::istream& operator>>(std::istream& stream, CMyString& str)
 }
 
 
-bool CMyString::IsUsingStaticBuffer() const noexcept
+bool CMyString::IsEmpty() const noexcept
 {
     return m_data == s_emptyBuffer;
 }
@@ -273,7 +275,7 @@ void CMyString::Reallocate(const size_t newCapacity)
     std::memcpy(newData, m_data, m_length);
     newData[m_length] = '\0';
 
-    if (!IsUsingStaticBuffer())
+    if (!IsEmpty())
     {
         delete[] m_data;
     }
