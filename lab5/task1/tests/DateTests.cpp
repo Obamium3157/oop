@@ -74,21 +74,96 @@ TEST_CASE("Day/month/year constructor", "[constructor]")
 
 TEST_CASE("Leap years", "[leap]")
 {
-    SECTION("29.02.2000 is valid (leap year)")
+    SECTION("Regular leap year (divisible by 4, not by 100)")
     {
-        // TODO: проверить, что вычисление високосного года не имеет погрешности на +- 1
-        CDate date(29, Month::FEBRUARY, 2000);
-        CHECK(date.GetDay() == 29);
+        CHECK_NOTHROW(CDate(29, Month::FEBRUARY, 1972));
+        CHECK_NOTHROW(CDate(29, Month::FEBRUARY, 2004));
+        CHECK_NOTHROW(CDate(29, Month::FEBRUARY, 2024));
     }
-    SECTION("29.02.2026 is invalid (non-leap year)")
+
+    SECTION("Regular non-leap year (not divisible by 4)")
     {
-        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 2026), std::invalid_argument);
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 2001), std::invalid_argument);
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 2002), std::invalid_argument);
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 2003), std::invalid_argument);
     }
-    SECTION("1972 is a leap year")
+
+    SECTION("Century year is not a leap year (divisible by 100, not by 400)")
     {
-        CDate date(29, Month::FEBRUARY, 1972);
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 2100), std::invalid_argument);
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 2200), std::invalid_argument);
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 2300), std::invalid_argument);
+    }
+
+    SECTION("400-year century is a leap year")
+    {
+        CHECK_NOTHROW(CDate(29, Month::FEBRUARY, 2000));
+        CHECK_NOTHROW(CDate(29, Month::FEBRUARY, 2400));
+    }
+
+    SECTION("Year 2000 +- 1 (400 year boundary)")
+    {
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 1999), std::invalid_argument);
+        CHECK_NOTHROW(CDate(29, Month::FEBRUARY, 2000));
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 2001), std::invalid_argument);
+    }
+
+    SECTION("Year 2100 (100-year boundary)")
+    {
+        CHECK_NOTHROW(CDate(29, Month::FEBRUARY, 2096));
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 2097), std::invalid_argument);
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 2100), std::invalid_argument);
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 2101), std::invalid_argument);
+        CHECK_NOTHROW(CDate(29, Month::FEBRUARY, 2104));
+    }
+
+    SECTION("Year 1972 +- 1")
+    {
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 1971), std::invalid_argument);
+        CHECK_NOTHROW(CDate(29, Month::FEBRUARY, 1972));
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 1973), std::invalid_argument);
+    }
+
+    SECTION("Boundary aof valid date range")
+    {
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 1970), std::invalid_argument);
+        CHECK_NOTHROW(CDate(29, Month::FEBRUARY, 1972));
+        CHECK_NOTHROW(CDate(29, Month::FEBRUARY, 9996));
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 9999), std::invalid_argument);
+    }
+
+    SECTION("February 28 is always valid")
+    {
+        CHECK_NOTHROW(CDate(28, Month::FEBRUARY, 2000));
+        CHECK_NOTHROW(CDate(28, Month::FEBRUARY, 2001));
+        CHECK_NOTHROW(CDate(28, Month::FEBRUARY, 2100));
+    }
+
+    SECTION("Increment across February in leap year")
+    {
+        CDate date(28, Month::FEBRUARY, 2000);
+        ++date;
         CHECK(date.GetDay() == 29);
         CHECK(date.GetMonth() == Month::FEBRUARY);
+        ++date;
+        CHECK(date.GetDay() == 1);
+        CHECK(date.GetMonth() == Month::MARCH);
+    }
+
+    SECTION("Increment across February in non-leap year")
+    {
+        CDate date(28, Month::FEBRUARY, 2001);
+        ++date;
+        CHECK(date.GetDay() == 1);
+        CHECK(date.GetMonth() == Month::MARCH);
+    }
+
+    SECTION("GetDay, GetMonth, GetYear are correct for February 29")
+    {
+        CDate date(29, Month::FEBRUARY, 2000);
+        CHECK(date.GetDay() == 29);
+        CHECK(date.GetMonth() == Month::FEBRUARY);
+        CHECK(date.GetYear() == 2000);
     }
 }
 
