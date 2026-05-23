@@ -71,12 +71,15 @@ namespace
         {
             port = std::stoul(portStr);
         }
-        catch (std::out_of_range const& e)
+        catch (std::out_of_range const&)
         {
             throw CUrlParsingError("Port value is out of range: " + portStr);
         }
 
-        ValidatePort(port);
+        if (port < MinPort || port > MaxPort)
+        {
+            throw CUrlParsingError("Port must be in range [1, 65535], got: " + portStr);
+        }
 
         return static_cast<unsigned short>(port);
     }
