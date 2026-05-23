@@ -105,64 +105,145 @@ void CMyString::Clear()
 
 CMyString& CMyString::operator=(CMyString const& other)
 {
-    throw std::logic_error("TODO: implement");
+    if (this == &other)
+    {
+        return *this;
+    }
+
+    CMyString temp(other);
+    std::swap(m_data, temp.m_data);
+    std::swap(m_length, temp.m_length);
+    std::swap(m_capacity, temp.m_capacity);
+
+    return *this;
 }
 
 CMyString& CMyString::operator=(CMyString&& other) noexcept
 {
-    throw std::logic_error("TODO: implement");
+    if (this == &other)
+    {
+        return *this;
+    }
+
+    if (!IsUsingStaticBuffer())
+    {
+        delete[] m_data;
+    }
+
+    m_data = other.m_data;
+    m_length = other.m_length;
+    m_capacity = other.m_capacity;
+
+    other.m_data = s_emptyBuffer;
+    other.m_length = 0;
+    m_capacity = 0;
+
+    return *this;
 }
 
 CMyString& CMyString::operator+=(CMyString const& other)
 {
-    throw std::logic_error("TODO: implement");
+    if (other.m_length == 0)
+    {
+        return *this;
+    }
+
+    const size_t newLength = m_length + other.m_length;
+
+    if (newLength > m_capacity)
+    {
+        const size_t newCapacity = std::max(newLength, m_capacity * 2);
+        Reallocate(newCapacity);
+    }
+
+    std::memcpy(m_data + m_length, other.m_data, other.m_length);
+    m_length = newLength;
+    m_data[m_length] = '\0';
+
+    return *this;
 }
 
 
-char& CMyString::operator[](size_t index)
+char& CMyString::operator[](const size_t index)
 {
-    throw std::logic_error("TODO: implement");
+    if (index >= m_length)
+    {
+        throw std::out_of_range("CMyString: index out of range");
+    }
+
+    return m_data[index];
 }
 
-const char& CMyString::operator[](size_t index) const
+const char& CMyString::operator[](const size_t index) const
 {
-    throw std::logic_error("TODO: implement");
+    if (index >= m_length)
+    {
+        throw std::out_of_range("CMyString: index out of range");
+    }
+
+    return m_data[index];
 }
 
 CMyString operator+(CMyString lhs, CMyString const& rhs)
 {
-    throw std::logic_error("TODO: implement");
+    lhs += rhs;
+
+    return lhs;
 }
 
 CMyString operator+(std::string const& lhs, CMyString const& rhs)
 {
-    throw std::logic_error("TODO: implement");
+    return CMyString(lhs) + rhs;
 }
 
 CMyString operator+(const char* lhs, CMyString const& rhs)
 {
-    throw std::logic_error("TODO: implement");
+    return CMyString(lhs) + rhs;
 }
 
 
 bool operator==(CMyString const& lhs, CMyString const& rhs)
 {
-    throw std::logic_error("TODO: implement");
+    if (lhs.m_length != rhs.m_length)
+    {
+        return false;
+    }
+
+    return std::memcmp(lhs.m_data, rhs.m_data, lhs.m_length) == 0;
 }
 
 std::strong_ordering operator<=>(CMyString const& lhs, CMyString const& rhs)
 {
-    throw std::logic_error("TODO: implement");
+    const size_t commonLength = std::min(lhs.m_length, rhs.m_length);
+
+    if (const int result = std::memcmp(lhs.m_data, rhs.m_data, commonLength);
+        result != 0)
+    {
+        return result < 0
+            ? std::strong_ordering::less
+            : std::strong_ordering::greater;
+    }
+
+    return lhs.m_length <=> rhs.m_length;
 }
 
 std::ostream& operator<<(std::ostream& stream, CMyString const& str)
 {
-    throw std::logic_error("TODO: implement");
+    stream.write(str.m_data, static_cast<std::streamsize>(str.m_length));
+    return stream;
 }
 
 std::istream& operator>>(std::istream& stream, CMyString& str)
 {
-    throw std::logic_error("TODO: implement");
+    str.Clear();
+
+    char ch;
+    while (stream.get(ch) && !std::isspace(static_cast<unsigned char>(ch)))
+    {
+        str += CMyString(&ch, 1);
+    }
+
+    return stream;
 }
 
 
@@ -171,7 +252,18 @@ bool CMyString::IsUsingStaticBuffer() const noexcept
     return m_data == s_emptyBuffer;
 }
 
-void CMyString::Reallocate(size_t newCapacity)
+void CMyString::Reallocate(const size_t newCapacity)
 {
-    throw std::logic_error("TODO: implement");
+    char* newData = new char[newCapacity + 1];
+
+    std::memcpy(newData, m_data, m_length);
+    newData[m_length] = '\0';
+
+    if (!IsUsingStaticBuffer())
+    {
+        delete[] m_data;
+    }
+
+    m_data = newData;
+    m_capacity = newCapacity;
 }
