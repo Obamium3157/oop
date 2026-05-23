@@ -255,6 +255,9 @@ TEST_CASE("Prefix ++", "[increment]")
     {
         CDate date(31, Month::DECEMBER, 9999);
         CHECK_THROWS_AS(++date, std::out_of_range);
+        CHECK(date.GetDay() == 31);
+        CHECK(date.GetMonth() == Month::DECEMBER);
+        CHECK(date.GetYear() == 9999);
     }
 }
 
@@ -376,6 +379,9 @@ TEST_CASE("Adding days (+)", "[arithmetic]")
     {
         CDate date(31, Month::DECEMBER, 9999);
         CHECK_THROWS_AS(date + 1, std::out_of_range);
+        CHECK(date.GetDay() == 31);
+        CHECK(date.GetMonth() == Month::DECEMBER);
+        CHECK(date.GetYear() == 9999);
     }
 }
 
@@ -459,11 +465,17 @@ TEST_CASE("Operator +=", "[arithmetic]")
     {
         CDate date(31, Month::DECEMBER, 9999);
         CHECK_THROWS_AS(date += 1, std::out_of_range);
+        CHECK(date.GetDay() == 31);
+        CHECK(date.GetMonth() == Month::DECEMBER);
+        CHECK(date.GetYear() == 9999);
     }
     SECTION("+= out of lower bound throws")
     {
         CDate date(1, Month::JANUARY, 1970);
         CHECK_THROWS_AS(date += -1, std::out_of_range);
+        CHECK(date.GetDay() == 1);
+        CHECK(date.GetMonth() == Month::JANUARY);
+        CHECK(date.GetYear() == 1970);
     }
 }
 
@@ -496,11 +508,17 @@ TEST_CASE("Operator -=", "[arithmetic]")
     {
         CDate date(1, Month::JANUARY, 1970);
         CHECK_THROWS_AS(date -= 1, std::out_of_range);
+        CHECK(date.GetDay() == 1);
+        CHECK(date.GetMonth() == Month::JANUARY);
+        CHECK(date.GetYear() == 1970);
     }
     SECTION("-= out of upper bound throws")
     {
         CDate date(31, Month::DECEMBER, 9999);
         CHECK_THROWS_AS(date -= -1, std::out_of_range);
+        CHECK(date.GetDay() == 31);
+        CHECK(date.GetMonth() == Month::DECEMBER);
+        CHECK(date.GetYear() == 9999);
     }
 }
 
