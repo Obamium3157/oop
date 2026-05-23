@@ -9,11 +9,11 @@ class CMyString
 {
 public:
     CMyString();
-    CMyString(const char* pString);
+    explicit CMyString(const char* pString);
     CMyString(const char* pString, size_t length);
     CMyString(CMyString const& other);
     CMyString(CMyString&& other) noexcept;
-    CMyString(std::string const& stlString);
+    explicit CMyString(std::string const& stlString);
     ~CMyString();
 
     size_t GetLength() const;
