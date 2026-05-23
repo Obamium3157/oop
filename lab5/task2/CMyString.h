@@ -40,7 +40,7 @@ public:
     friend std::istream& operator>>(std::istream& stream, CMyString& str);
 
 private:
-    static char s_emptyBuffer[1];
+    static inline char s_emptyBuffer[1] = { '\0' };
 
     char* m_data;
     size_t m_length;

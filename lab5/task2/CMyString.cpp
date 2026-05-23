@@ -1,68 +1,105 @@
 #include "CMyString.h"
+
+#include <cstring>
 #include <stdexcept>
 
-char CMyString::s_emptyBuffer[1] = { '\0' };
-
-
 CMyString::CMyString()
+    : m_data(s_emptyBuffer)
+    , m_length(0)
+    , m_capacity(0)
 {
-    throw std::logic_error("TODO: implement");
 }
 
 CMyString::CMyString(const char* pString)
+    : CMyString(pString, pString ? std::strlen(pString) : 0)
 {
-    throw std::logic_error("TODO: implement");
 }
 
-CMyString::CMyString(const char* pString, size_t length)
+CMyString::CMyString(const char* pString, const size_t length)
+    : m_data(s_emptyBuffer)
+    , m_length(0)
+    , m_capacity(0)
 {
-    throw std::logic_error("TODO: implement");
+    if (length == 0)
+    {
+        return;
+    }
+
+    m_data = new char[length + 1];
+    m_length = length;
+    m_capacity = length;
+
+    std::memcpy(m_data, pString, length);
+    m_data[length] = '\0';
 }
 
 CMyString::CMyString(CMyString const& other)
+    : CMyString(other.m_data, other.m_length)
 {
-    throw std::logic_error("TODO: implement");
 }
 
 CMyString::CMyString(CMyString&& other) noexcept
+    : m_data(other.m_data)
+    , m_length(other.m_length)
+    , m_capacity(other.m_capacity)
 {
-    throw std::logic_error("TODO: implement");
+    other.m_data = s_emptyBuffer;
+    other.m_length = 0;
+    other.m_capacity = 0;
 }
 
 CMyString::CMyString(std::string const& stlString)
+    : CMyString(stlString.data(), stlString.size())
 {
-    throw std::logic_error("TODO: implement");
 }
 
 CMyString::~CMyString()
 {
-    // TODO: implement
+    if (!IsUsingStaticBuffer())
+    {
+        delete[] m_data;
+    }
 }
 
 
 size_t CMyString::GetLength() const
 {
-    throw std::logic_error("TODO: implement");
+    return m_length;
 }
 
 const char* CMyString::GetStringData() const
 {
-    throw std::logic_error("TODO: implement");
-}
-
-CMyString CMyString::SubString(size_t start, size_t length) const
-{
-    throw std::logic_error("TODO: implement");
-}
-
-void CMyString::Clear()
-{
-    throw std::logic_error("TODO: implement");
+    return m_data;
 }
 
 size_t CMyString::GetCapacity() const
 {
-    throw std::logic_error("TODO: implement");
+    return m_capacity;
+}
+
+CMyString CMyString::SubString(const size_t start, const size_t length) const
+{
+    if (start > m_length)
+    {
+        throw std::out_of_range("SubString: start index out of range");
+    }
+
+    const size_t availableLength = m_length - start;
+    const size_t actualLength = std::min(length, availableLength);
+
+    return {m_data + start, actualLength};
+}
+
+void CMyString::Clear()
+{
+    if (!IsUsingStaticBuffer())
+    {
+        delete[] m_data;
+    }
+
+    m_data = s_emptyBuffer;
+    m_length = 0;
+    m_capacity = 0;
 }
 
 
@@ -131,7 +168,7 @@ std::istream& operator>>(std::istream& stream, CMyString& str)
 
 bool CMyString::IsUsingStaticBuffer() const noexcept
 {
-    throw std::logic_error("TODO: implement");
+    return m_data == s_emptyBuffer;
 }
 
 void CMyString::Reallocate(size_t newCapacity)
