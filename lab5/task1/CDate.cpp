@@ -1,6 +1,5 @@
 #include "CDate.h"
 #include <iomanip>
-#include <limits>
 #include <utility>
 
 namespace
@@ -19,7 +18,6 @@ namespace
     constexpr unsigned MinYear = 1970;
     constexpr unsigned MaxYear = 9999;
     const unsigned MaxValidTimestamp = ComputeTimestamp(31, Month::DECEMBER, MaxYear);
-    constexpr unsigned InvalidTimestamp = std::numeric_limits<unsigned>::max();
     constexpr unsigned GregorianCycleYears = 400;
     const unsigned GregorianCycleDays = GregorianCycleYears * 365 + CountLeapYearsUpTo(GregorianCycleYears);
 
@@ -79,7 +77,6 @@ namespace
     {
         constexpr unsigned daysInWeek = 7;
         constexpr unsigned epochWeekDayOffset = 4;
-
         return static_cast<WeekDay>((timestamp + epochWeekDayOffset) % daysInWeek);
     }
 
@@ -123,13 +120,21 @@ namespace
 }
 
 CDate::CDate(const unsigned day, const Month month, const unsigned year)
-    : m_timestamp(IsDateValid(day, month, year) ? ComputeTimestamp(day, month, year) : InvalidTimestamp)
 {
+    if (!IsDateValid(day, month, year))
+    {
+        throw std::invalid_argument("Invalid date");
+    }
+    m_timestamp = ComputeTimestamp(day, month, year);
 }
 
 CDate::CDate(const unsigned timestamp)
-    : m_timestamp(timestamp <= MaxValidTimestamp ? timestamp : InvalidTimestamp)
 {
+    if (timestamp > MaxValidTimestamp)
+    {
+        throw std::invalid_argument("Timestamp out of valid range");
+    }
+    m_timestamp = timestamp;
 }
 
 CDate::CDate()
@@ -137,61 +142,34 @@ CDate::CDate()
 {
 }
 
-bool CDate::IsValid() const
-{
-    return m_timestamp != InvalidTimestamp;
-}
-
 unsigned CDate::GetYear() const
 {
-    if (!IsValid())
-    {
-        return 0;
-    }
     return YearFromTimestamp(m_timestamp);
 }
 
 Month CDate::GetMonth() const
 {
-    if (!IsValid())
-    {
-        return Month::JANUARY;
-    }
     return ExtractMonthAndDay(m_timestamp).first;
 }
 
 unsigned CDate::GetDay() const
 {
-    if (!IsValid())
-    {
-        return 0;
-    }
     return ExtractMonthAndDay(m_timestamp).second;
 }
 
 WeekDay CDate::GetWeekDay() const
 {
-    if (!IsValid())
-    {
-        return WeekDay::SUNDAY;
-    }
     return WeekDayFromTimestamp(m_timestamp);
 }
 
 CDate& CDate::operator++()
 {
-    if (IsValid())
+    if (m_timestamp >= MaxValidTimestamp)
     {
-        if (m_timestamp >= MaxValidTimestamp)
-        {
-            m_timestamp = InvalidTimestamp;
-        }
-        else
-        {
-            ++m_timestamp;
-        }
+        throw std::out_of_range("Date out of valid range");
     }
 
+    ++m_timestamp;
     return *this;
 }
 
@@ -204,18 +182,12 @@ CDate CDate::operator++(int)
 
 CDate& CDate::operator--()
 {
-    if (IsValid())
+    if (m_timestamp == 0)
     {
-        if (m_timestamp == 0)
-        {
-            m_timestamp = InvalidTimestamp;
-        }
-        else
-        {
-            --m_timestamp;
-        }
+        throw std::out_of_range("Date out of valid range");
     }
 
+    --m_timestamp;
     return *this;
 }
 
@@ -228,41 +200,25 @@ CDate CDate::operator--(int)
 
 CDate& CDate::operator+=(const int days)
 {
-    if (!IsValid())
+    const long long result = static_cast<long long>(m_timestamp) + days;
+    if (result < 0 || result > static_cast<long long>(MaxValidTimestamp))
     {
-        return *this;
+        throw std::out_of_range("Date out of valid range");
     }
 
-    if (const long long result = static_cast<long long>(m_timestamp) + days;
-        result < 0 || result > static_cast<long long>(MaxValidTimestamp))
-    {
-        m_timestamp = InvalidTimestamp;
-    }
-    else
-    {
-        m_timestamp = static_cast<unsigned>(result);
-    }
-
+    m_timestamp = static_cast<unsigned>(result);
     return *this;
 }
 
 CDate& CDate::operator-=(const int days)
 {
-    if (!IsValid())
+    const long long result = static_cast<long long>(m_timestamp) - days;
+    if (result < 0 || result > static_cast<long long>(MaxValidTimestamp))
     {
-        return *this;
+        throw std::out_of_range("Date out of valid range");
     }
 
-    if (const long long result = static_cast<long long>(m_timestamp) - days;
-        result < 0 || result > static_cast<long long>(MaxValidTimestamp))
-    {
-        m_timestamp = InvalidTimestamp;
-    }
-    else
-    {
-        m_timestamp = static_cast<unsigned>(result);
-    }
-
+    m_timestamp = static_cast<unsigned>(result);
     return *this;
 }
 
@@ -287,21 +243,11 @@ CDate operator-(const CDate& date, const int days)
 
 int operator-(const CDate& lhs, const CDate& rhs)
 {
-    if (!lhs.IsValid() || !rhs.IsValid())
-    {
-        return 0;
-    }
-
     return static_cast<int>(lhs.m_timestamp) - static_cast<int>(rhs.m_timestamp);
 }
 
 std::ostream& operator<<(std::ostream& os, const CDate& date)
 {
-    if (!date.IsValid())
-    {
-        os << "INVALID";
-        return os;
-    }
     os << std::setfill('0')
         << std::setw(2) << date.GetDay() << '.'
         << std::setw(2) << static_cast<unsigned>(date.GetMonth()) << '.'
@@ -312,29 +258,17 @@ std::ostream& operator<<(std::ostream& os, const CDate& date)
 std::istream& operator>>(std::istream& is, CDate& date)
 {
     is >> std::ws;
-    if (is.peek() == 'I')
-    {
-        std::string token;
-        is >> token;
-        if (token == "INVALID")
-        {
-            date = CDate(InvalidTimestamp);
-        }
-        else
-        {
-            is.setstate(std::ios::failbit);
-        }
-        return is;
-    }
-
     unsigned day, month, year;
-
     if (char dot1, dot2; !(is >> day >> dot1 >> month >> dot2 >> year) || dot1 != '.' || dot2 != '.')
     {
         is.setstate(std::ios::failbit);
         return is;
     }
-
+    if (!IsDateValid(day, static_cast<Month>(month), year))
+    {
+        is.setstate(std::ios::failbit);
+        return is;
+    }
     date = CDate(day, static_cast<Month>(month), year);
     return is;
 }

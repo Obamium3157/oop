@@ -1,14 +1,11 @@
 #include <catch2/catch_test_macros.hpp>
 #include <sstream>
+#include <stdexcept>
 #include "../CDate.h"
-
-// TODO: умножить число тестов на 2 (сделать одинаковые тесты для валидного и невалидного состояния)
-// TODO: добавить тесты для невалидной даты
 
 TEST_CASE("Default constructor creates 01.01.1970", "[constructor]")
 {
     const CDate date;
-    REQUIRE(date.IsValid());
     CHECK(date.GetDay() == 1);
     CHECK(date.GetMonth() == Month::JANUARY);
     CHECK(date.GetYear() == 1970);
@@ -19,7 +16,6 @@ TEST_CASE("Timestamp constructor", "[constructor]")
     SECTION("timestamp 0 = 01.01.1970")
     {
         CDate date(0);
-        REQUIRE(date.IsValid());
         CHECK(date.GetDay() == 1);
         CHECK(date.GetMonth() == Month::JANUARY);
         CHECK(date.GetYear() == 1970);
@@ -27,7 +23,6 @@ TEST_CASE("Timestamp constructor", "[constructor]")
     SECTION("timestamp 2 = 03.01.1970")
     {
         CDate date(2);
-        REQUIRE(date.IsValid());
         CHECK(date.GetDay() == 3);
         CHECK(date.GetMonth() == Month::JANUARY);
         CHECK(date.GetYear() == 1970);
@@ -35,10 +30,13 @@ TEST_CASE("Timestamp constructor", "[constructor]")
     SECTION("timestamp 32 = 02.02.1970")
     {
         CDate date(32);
-        REQUIRE(date.IsValid());
         CHECK(date.GetDay() == 2);
         CHECK(date.GetMonth() == Month::FEBRUARY);
         CHECK(date.GetYear() == 1970);
+    }
+    SECTION("timestamp out of valid range throws")
+    {
+        CHECK_THROWS_AS(CDate(std::numeric_limits<unsigned>::max()), std::invalid_argument);
     }
 }
 
@@ -46,36 +44,33 @@ TEST_CASE("Day/month/year constructor", "[constructor]")
 {
     SECTION("valid date")
     {
-        CDate date(15, Month::JUNE, 2000);
-        REQUIRE(date.IsValid());
+        CHECK_NOTHROW(CDate(15, Month::JUNE, 2000));
     }
     SECTION("maximum valid date: 31.12.9999")
     {
-        CDate date(31, Month::DECEMBER, 9999);
-        REQUIRE(date.IsValid());
+        CHECK_NOTHROW(CDate(31, Month::DECEMBER, 9999));
     }
-    SECTION("invalid day")
+    SECTION("invalid day throws")
     {
-        CHECK_FALSE(CDate(32, Month::JANUARY, 2000).IsValid());
+        CHECK_THROWS_AS(CDate(32, Month::JANUARY, 2000), std::invalid_argument);
     }
-    SECTION("zero day")
+    SECTION("zero day throws")
     {
-        CHECK_FALSE(CDate(0, Month::JANUARY, 2000).IsValid());
+        CHECK_THROWS_AS(CDate(0, Month::JANUARY, 2000), std::invalid_argument);
     }
-    SECTION("invalid month")
+    SECTION("invalid month throws")
     {
-        CHECK_FALSE(CDate(1, static_cast<Month>(13), 2000).IsValid());
+        CHECK_THROWS_AS(CDate(1, static_cast<Month>(13), 2000), std::invalid_argument);
     }
-    SECTION("year before 1970")
+    SECTION("year before 1970 throws")
     {
-        CHECK_FALSE(CDate(1, Month::JANUARY, 1969).IsValid());
+        CHECK_THROWS_AS(CDate(1, Month::JANUARY, 1969), std::invalid_argument);
     }
-    SECTION("year after 9999")
+    SECTION("year after 9999 throws")
     {
-        CHECK_FALSE(CDate(1, Month::JANUARY, 10000).IsValid());
+        CHECK_THROWS_AS(CDate(1, Month::JANUARY, 10000), std::invalid_argument);
     }
 }
-
 
 TEST_CASE("Leap years", "[leap]")
 {
@@ -83,22 +78,19 @@ TEST_CASE("Leap years", "[leap]")
     {
         // TODO: проверить, что вычисление високосного года не имеет погрешности на +- 1
         CDate date(29, Month::FEBRUARY, 2000);
-        REQUIRE(date.IsValid());
         CHECK(date.GetDay() == 29);
     }
     SECTION("29.02.2026 is invalid (non-leap year)")
     {
-        CHECK_FALSE(CDate(29, Month::FEBRUARY, 2026).IsValid());
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 2026), std::invalid_argument);
     }
     SECTION("1972 is a leap year")
     {
         CDate date(29, Month::FEBRUARY, 1972);
-        REQUIRE(date.IsValid());
         CHECK(date.GetDay() == 29);
         CHECK(date.GetMonth() == Month::FEBRUARY);
     }
 }
-
 
 TEST_CASE("Weekday", "[weekday]")
 {
@@ -151,11 +143,10 @@ TEST_CASE("Prefix ++", "[increment]")
         CHECK(date.GetMonth() == Month::JANUARY);
         CHECK(date.GetYear() == 2001);
     }
-    SECTION("going past maximum => invalid")
+    SECTION("going past maximum throws")
     {
         CDate date(31, Month::DECEMBER, 9999);
-        ++date;
-        CHECK_FALSE(date.IsValid());
+        CHECK_THROWS_AS(++date, std::out_of_range);
     }
 }
 
@@ -193,11 +184,10 @@ TEST_CASE("Prefix --", "[decrement]")
         CHECK(date.GetDay() == 29);
         CHECK(date.GetMonth() == Month::FEBRUARY);
     }
-    SECTION("decrement from epoch => invalid")
+    SECTION("decrement from epoch throws")
     {
         CDate date(1, Month::JANUARY, 1970);
-        --date;
-        CHECK_FALSE(date.IsValid());
+        CHECK_THROWS_AS(--date, std::out_of_range);
     }
 }
 
@@ -209,22 +199,6 @@ TEST_CASE("Postfix --", "[decrement]")
     CHECK(old.GetMonth() == Month::MARCH);
     CHECK(date.GetDay() == 28);
     CHECK(date.GetMonth() == Month::FEBRUARY);
-}
-
-TEST_CASE("Operations on invalid date do not change it", "[invalid]")
-{
-    CDate date(1, Month::JANUARY, 1970);
-    --date;
-    REQUIRE_FALSE(date.IsValid());
-
-    ++date;
-    CHECK_FALSE(date.IsValid());
-    --date;
-    CHECK_FALSE(date.IsValid());
-    date += 100;
-    CHECK_FALSE(date.IsValid());
-    date -= 100;
-    CHECK_FALSE(date.IsValid());
 }
 
 TEST_CASE("Adding days (+)", "[arithmetic]")
@@ -247,10 +221,10 @@ TEST_CASE("Adding days (+)", "[arithmetic]")
         CHECK(result.GetDay() == 2);
         CHECK(result.GetMonth() == Month::JANUARY);
     }
-    SECTION("going past maximum => invalid")
+    SECTION("going past maximum throws")
     {
         CDate date(31, Month::DECEMBER, 9999);
-        CHECK_FALSE((date + 1).IsValid());
+        CHECK_THROWS_AS(date + 1, std::out_of_range);
     }
 }
 
@@ -263,9 +237,9 @@ TEST_CASE("Subtracting days (-)", "[arithmetic]")
         CHECK(result.GetMonth() == Month::DECEMBER);
         CHECK(result.GetYear() == 2009);
     }
-    SECTION("going past minimum => invalid")
+    SECTION("going past minimum throws")
     {
-        CHECK_FALSE((CDate(1, Month::JANUARY, 1970) - 1).IsValid());
+        CHECK_THROWS_AS(CDate(1, Month::JANUARY, 1970) - 1, std::out_of_range);
     }
 }
 
@@ -357,14 +331,7 @@ TEST_CASE("Output operator <<", "[io]")
         os << CDate(31, Month::DECEMBER, 9999);
         CHECK(os.str() == "31.12.9999");
     }
-    SECTION("invalid date => INVALID")
-    {
-        std::ostringstream os;
-        os << CDate(32, Month::JANUARY, 2000);
-        CHECK(os.str() == "INVALID");
-    }
 }
-
 
 TEST_CASE("Input operator >>", "[io]")
 {
@@ -378,19 +345,21 @@ TEST_CASE("Input operator >>", "[io]")
         CHECK(date.GetMonth() == Month::JUNE);
         CHECK(date.GetYear() == 2000);
     }
-    SECTION("keyword INVALID")
-    {
-        std::istringstream is("INVALID");
-        CDate date(1, Month::JANUARY, 2000);
-        is >> date;
-        REQUIRE(is);
-        CHECK_FALSE(date.IsValid());
-    }
-    SECTION("invalid date (day 32) => IsValid() == false")
+    SECTION("invalid date sets failbit, date unchanged")
     {
         std::istringstream is("32.01.2000");
+        CDate date(1, Month::JANUARY, 1970);
+        is >> date;
+        CHECK_FALSE(is);
+        CHECK(date.GetDay() == 1);
+        CHECK(date.GetMonth() == Month::JANUARY);
+        CHECK(date.GetYear() == 1970);
+    }
+    SECTION("wrong format sets failbit")
+    {
+        std::istringstream is("2000/01/15");
         CDate date;
         is >> date;
-        CHECK_FALSE(date.IsValid());
+        CHECK_FALSE(is);
     }
 }

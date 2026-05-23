@@ -3,6 +3,7 @@
 
 #include <compare>
 #include <iosfwd>
+#include <stdexcept>
 
 enum class Month
 {
@@ -20,7 +21,10 @@ enum class WeekDay
 class CDate
 {
 public:
+    /// @throws std::invalid_argument при некорректной дате
     CDate(unsigned day, Month month, unsigned year);
+
+    /// @throws std::invalid_argument при выходе за допустимый диапазон
     explicit CDate(unsigned timestamp);
     CDate();
 
@@ -28,14 +32,19 @@ public:
     Month GetMonth() const;
     unsigned GetYear() const;
     WeekDay GetWeekDay() const;
-    bool IsValid() const;
 
+    /// @throws std::out_of_range при выходе за допустимый диапазон
     CDate& operator++();
+    /// @throws std::out_of_range при выходе за допустимый диапазон
     CDate operator++(int);
+    /// @throws std::out_of_range при выходе за допустимый диапазон
     CDate& operator--();
+    /// @throws std::out_of_range при выходе за допустимый диапазон
     CDate operator--(int);
 
+    /// @throws std::out_of_range при выходе за допустимый диапазон
     CDate& operator+=(int days);
+    /// @throws std::out_of_range при выходе за допустимый диапазон
     CDate& operator-=(int days);
 
     auto operator<=>(const CDate& other) const = default;
@@ -48,10 +57,8 @@ private:
     unsigned m_timestamp;
 };
 
-
 CDate operator+(const CDate& date, int days);
 CDate operator+(int days, const CDate& date);
 CDate operator-(const CDate& date, int days);
-
 
 #endif //OOP_CDATE_H
