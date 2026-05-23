@@ -11,8 +11,17 @@ CMyString::CMyString()
 }
 
 CMyString::CMyString(const char* pString)
-    : CMyString(pString, pString ? std::strlen(pString) : 0)
+    : m_data(s_emptyBuffer)
+    , m_length(0)
+    , m_capacity(0)
 {
+    if (pString == nullptr)
+    {
+        throw std::invalid_argument("CMyString: pString must be non-null");
+    }
+
+    const size_t length = std::strlen(pString);
+    *this = CMyString(pString, length);
 }
 
 CMyString::CMyString(const char* pString, const size_t length)
@@ -20,6 +29,11 @@ CMyString::CMyString(const char* pString, const size_t length)
     , m_length(0)
     , m_capacity(0)
 {
+    if (pString == nullptr)
+    {
+        throw std::invalid_argument("CMyString: pString must be non-null");
+    }
+
     if (length == 0)
     {
         return;
@@ -136,7 +150,7 @@ CMyString& CMyString::operator=(CMyString&& other) noexcept
 
     other.m_data = s_emptyBuffer;
     other.m_length = 0;
-    m_capacity = 0;
+    other.m_capacity = 0;
 
     return *this;
 }

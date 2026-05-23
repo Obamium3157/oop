@@ -5,8 +5,8 @@ add_executable(String StringProgram.cpp
         CMyString.h
         CMyString.cpp)
 
-add_executable(StringTests tests/StringTests.cpp
+add_executable(MyStringTests tests/CMyStringTests.cpp
         CMyString.h
         CMyString.cpp)
 
-target_link_libraries(StringTests PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(MyStringTests PRIVATE Catch2::Catch2WithMain)
