@@ -62,6 +62,10 @@ TEST_CASE("Day/month/year constructor", "[constructor]")
     {
         CHECK_THROWS_AS(CDate(1, static_cast<Month>(13), 2000), std::invalid_argument);
     }
+    SECTION("month 0 throws")
+    {
+        CHECK_THROWS_AS(CDate(1, static_cast<Month>(0), 2000), std::invalid_argument);
+    }
     SECTION("year before 1970 throws")
     {
         CHECK_THROWS_AS(CDate(1, Month::JANUARY, 1969), std::invalid_argument);
@@ -69,6 +73,21 @@ TEST_CASE("Day/month/year constructor", "[constructor]")
     SECTION("year after 9999 throws")
     {
         CHECK_THROWS_AS(CDate(1, Month::JANUARY, 10000), std::invalid_argument);
+    }
+    SECTION("last valid day of 31-day month")
+    {
+        CHECK_NOTHROW(CDate(31, Month::JANUARY, 2000));
+        CHECK_THROWS_AS(CDate(32, Month::JANUARY, 2000), std::invalid_argument);
+    }
+    SECTION("last valid day of 30-day month")
+    {
+        CHECK_NOTHROW(CDate(30, Month::APRIL, 2000));
+        CHECK_THROWS_AS(CDate(31, Month::APRIL, 2000), std::invalid_argument);
+    }
+    SECTION("last valid day of February in non-leap year")
+    {
+        CHECK_NOTHROW(CDate(28, Month::FEBRUARY, 2001));
+        CHECK_THROWS_AS(CDate(29, Month::FEBRUARY, 2001), std::invalid_argument);
     }
 }
 
@@ -169,19 +188,33 @@ TEST_CASE("Leap years", "[leap]")
 
 TEST_CASE("Weekday", "[weekday]")
 {
+    SECTION("05.01.1970 is Monday")
+    {
+        CHECK(CDate(5, Month::JANUARY, 1970).GetWeekDay() == WeekDay::MONDAY);
+    }
+    SECTION("06.01.1970 is Tuesday")
+    {
+        CHECK(CDate(6, Month::JANUARY, 1970).GetWeekDay() == WeekDay::TUESDAY);
+    }
+    SECTION("07.01.1970 is Wednesday")
+    {
+        CHECK(CDate(7, Month::JANUARY, 1970).GetWeekDay() == WeekDay::WEDNESDAY);
+    }
     SECTION("01.01.1970 is Thursday")
     {
-        CHECK(CDate().GetWeekDay() == WeekDay::THURSDAY);
+        CHECK(CDate(1, Month::JANUARY, 1970).GetWeekDay() == WeekDay::THURSDAY);
     }
     SECTION("02.01.1970 is Friday")
     {
-        CDate date;
-        ++date;
-        CHECK(date.GetWeekDay() == WeekDay::FRIDAY);
+        CHECK(CDate(2, Month::JANUARY, 1970).GetWeekDay() == WeekDay::FRIDAY);
     }
-    SECTION("01.01.2024 is Monday")
+    SECTION("03.01.1970 is Saturday")
     {
-        CHECK(CDate(1, Month::JANUARY, 2024).GetWeekDay() == WeekDay::MONDAY);
+        CHECK(CDate(3, Month::JANUARY, 1970).GetWeekDay() == WeekDay::SATURDAY);
+    }
+    SECTION("04.01.1970 is Sunday")
+    {
+        CHECK(CDate(4, Month::JANUARY, 1970).GetWeekDay() == WeekDay::SUNDAY);
     }
 }
 
@@ -227,12 +260,29 @@ TEST_CASE("Prefix ++", "[increment]")
 
 TEST_CASE("Postfix ++", "[increment]")
 {
-    CDate date(31, Month::JANUARY, 2000);
-    CDate old = date++;
-    CHECK(old.GetDay() == 31);
-    CHECK(old.GetMonth() == Month::JANUARY);
-    CHECK(date.GetDay() == 1);
-    CHECK(date.GetMonth() == Month::FEBRUARY);
+    SECTION("returns copy of original date")
+    {
+        CDate date(31, Month::JANUARY, 2000);
+        CDate old = date++;
+        CHECK(old.GetDay() == 31);
+        CHECK(old.GetMonth() == Month::JANUARY);
+        CHECK(date.GetDay() == 1);
+        CHECK(date.GetMonth() == Month::FEBRUARY);
+    }
+    SECTION("crossing year boundary")
+    {
+        CDate date(31, Month::DECEMBER, 2000);
+        CDate old = date++;
+        CHECK(old.GetYear() == 2000);
+        CHECK(date.GetDay() == 1);
+        CHECK(date.GetMonth() == Month::JANUARY);
+        CHECK(date.GetYear() == 2001);
+    }
+    SECTION("going past maximum throws")
+    {
+        CDate date(31, Month::DECEMBER, 9999);
+        CHECK_THROWS_AS(date++, std::out_of_range);
+    }
 }
 
 TEST_CASE("Prefix --", "[decrement]")
@@ -268,12 +318,29 @@ TEST_CASE("Prefix --", "[decrement]")
 
 TEST_CASE("Postfix --", "[decrement]")
 {
-    CDate date(1, Month::MARCH, 2001);
-    CDate old = date--;
-    CHECK(old.GetDay() == 1);
-    CHECK(old.GetMonth() == Month::MARCH);
-    CHECK(date.GetDay() == 28);
-    CHECK(date.GetMonth() == Month::FEBRUARY);
+    SECTION("returns copy of original date")
+    {
+        CDate date(1, Month::MARCH, 2001);
+        CDate old = date--;
+        CHECK(old.GetDay() == 1);
+        CHECK(old.GetMonth() == Month::MARCH);
+        CHECK(date.GetDay() == 28);
+        CHECK(date.GetMonth() == Month::FEBRUARY);
+    }
+    SECTION("crossing year boundary")
+    {
+        CDate date(1, Month::JANUARY, 2001);
+        CDate old = date--;
+        CHECK(old.GetYear() == 2001);
+        CHECK(date.GetDay() == 31);
+        CHECK(date.GetMonth() == Month::DECEMBER);
+        CHECK(date.GetYear() == 2000);
+    }
+    SECTION("going past minimum throws")
+    {
+        CDate date(1, Month::JANUARY, 1970);
+        CHECK_THROWS_AS(date--, std::out_of_range);
+    }
 }
 
 TEST_CASE("Adding days (+)", "[arithmetic]")
@@ -320,28 +387,112 @@ TEST_CASE("Subtracting days (-)", "[arithmetic]")
 
 TEST_CASE("Difference between two dates", "[arithmetic]")
 {
-    const CDate d1(3, Month::JANUARY, 2010);
-    const CDate d2(1, Month::JANUARY, 2010);
-    CHECK((d1 - d2) == 2);
-    CHECK((d2 - d1) == -2);
+    SECTION("same date gives 0")
+    {
+        const CDate date(15, Month::JUNE, 2000);
+        CHECK((date - date) == 0);
+    }
+    SECTION("adjacent days")
+    {
+        const CDate d1(2, Month::JANUARY, 2010);
+        const CDate d2(1, Month::JANUARY, 2010);
+        CHECK((d1 - d2) == 1);
+        CHECK((d2 - d1) == -1);
+    }
+    SECTION("difference across month boundary")
+    {
+        const CDate d1(3, Month::JANUARY, 2010);
+        const CDate d2(1, Month::JANUARY, 2010);
+        CHECK((d1 - d2) == 2);
+        CHECK((d2 - d1) == -2);
+    }
+    SECTION("difference across year boundary")
+    {
+        const CDate d1(1, Month::JANUARY, 2001);
+        const CDate d2(31, Month::DECEMBER, 2000);
+        CHECK((d1 - d2) == 1);
+        CHECK((d2 - d1) == -1);
+    }
+    SECTION("difference across leap day")
+    {
+        const CDate d1(1, Month::MARCH, 2000);
+        const CDate d2(28, Month::FEBRUARY, 2000);
+        CHECK((d1 - d2) == 2);
+    }
 }
 
 TEST_CASE("Operator +=", "[arithmetic]")
 {
-    CDate date(28, Month::FEBRUARY, 2000);
-    date += 2;
-    CHECK(date.GetDay() == 1);
-    CHECK(date.GetMonth() == Month::MARCH);
-    CHECK(date.GetYear() == 2000);
+    SECTION("crossing month boundary")
+    {
+        CDate date(28, Month::FEBRUARY, 2000);
+        date += 2;
+        CHECK(date.GetDay() == 1);
+        CHECK(date.GetMonth() == Month::MARCH);
+        CHECK(date.GetYear() == 2000);
+    }
+    SECTION("+= 0 leaves date unchanged")
+    {
+        CDate date(15, Month::JUNE, 2000);
+        date += 0;
+        CHECK(date.GetDay() == 15);
+        CHECK(date.GetMonth() == Month::JUNE);
+        CHECK(date.GetYear() == 2000);
+    }
+    SECTION("+= negative is equivalent to -=")
+    {
+        CDate date(5, Month::MARCH, 2000);
+        date += -3;
+        CHECK(date.GetDay() == 2);
+        CHECK(date.GetMonth() == Month::MARCH);
+    }
+    SECTION("+= out of upper bound throws")
+    {
+        CDate date(31, Month::DECEMBER, 9999);
+        CHECK_THROWS_AS(date += 1, std::out_of_range);
+    }
+    SECTION("+= out of lower bound throws")
+    {
+        CDate date(1, Month::JANUARY, 1970);
+        CHECK_THROWS_AS(date += -1, std::out_of_range);
+    }
 }
 
 TEST_CASE("Operator -=", "[arithmetic]")
 {
-    CDate date(1, Month::MARCH, 2000);
-    date -= 1;
-    CHECK(date.GetDay() == 29);
-    CHECK(date.GetMonth() == Month::FEBRUARY);
-    CHECK(date.GetYear() == 2000);
+    SECTION("crossing month boundary")
+    {
+        CDate date(1, Month::MARCH, 2000);
+        date -= 1;
+        CHECK(date.GetDay() == 29);
+        CHECK(date.GetMonth() == Month::FEBRUARY);
+        CHECK(date.GetYear() == 2000);
+    }
+    SECTION("-= 0 leaves date unchanged")
+    {
+        CDate date(15, Month::JUNE, 2000);
+        date -= 0;
+        CHECK(date.GetDay() == 15);
+        CHECK(date.GetMonth() == Month::JUNE);
+        CHECK(date.GetYear() == 2000);
+    }
+    SECTION("-= negative is equivalent to +=")
+    {
+        CDate date(1, Month::MARCH, 2000);
+        date -= -3;
+        CHECK(date.GetDay() == 4);
+        CHECK(date.GetMonth() == Month::MARCH);
+    }
+    SECTION("-= out of lower bound throws")
+    {
+        CDate date(1, Month::JANUARY, 1970);
+        CHECK_THROWS_AS(date -= 1, std::out_of_range);
+    }
+    SECTION("-= out of upper bound throws")
+    {
+        CDate date(31, Month::DECEMBER, 9999);
+        CHECK_THROWS_AS(date -= -1, std::out_of_range);
+    }
 }
 
 TEST_CASE("Date comparison", "[comparison]")
@@ -420,6 +571,24 @@ TEST_CASE("Input operator >>", "[io]")
         CHECK(date.GetMonth() == Month::JUNE);
         CHECK(date.GetYear() == 2000);
     }
+    SECTION("leading whitespace is skipped")
+    {
+        std::istringstream is("   15.06.2000");
+        CDate date;
+        is >> date;
+        REQUIRE(is);
+        CHECK(date.GetDay() == 15);
+        CHECK(date.GetMonth() == Month::JUNE);
+    }
+    SECTION("two dates in sequence")
+    {
+        std::istringstream is("01.01.2000 31.12.2001");
+        CDate d1, d2;
+        is >> d1 >> d2;
+        REQUIRE(is);
+        CHECK(d1.GetYear() == 2000);
+        CHECK(d2.GetYear() == 2001);
+    }
     SECTION("invalid date sets failbit, date unchanged")
     {
         std::istringstream is("32.01.2000");
@@ -436,5 +605,48 @@ TEST_CASE("Input operator >>", "[io]")
         CDate date;
         is >> date;
         CHECK_FALSE(is);
+    }
+    SECTION("non-numeric input sets failbit")
+    {
+        std::istringstream is("abc");
+        CDate date;
+        is >> date;
+        CHECK_FALSE(is);
+    }
+}
+
+TEST_CASE("Strong exception guarantee for mutating operators", "[exception_safety]")
+{
+    SECTION("prefix ++ leaves date unchanged on throw")
+    {
+        CDate date(31, Month::DECEMBER, 9999);
+        CHECK_THROWS_AS(++date, std::out_of_range);
+        CHECK(date.GetDay() == 31);
+        CHECK(date.GetMonth() == Month::DECEMBER);
+        CHECK(date.GetYear() == 9999);
+    }
+    SECTION("prefix -- leaves date unchanged on throw")
+    {
+        CDate date(1, Month::JANUARY, 1970);
+        CHECK_THROWS_AS(--date, std::out_of_range);
+        CHECK(date.GetDay() == 1);
+        CHECK(date.GetMonth() == Month::JANUARY);
+        CHECK(date.GetYear() == 1970);
+    }
+    SECTION("+= leaves date unchanged on throw")
+    {
+        CDate date(31, Month::DECEMBER, 9999);
+        CHECK_THROWS_AS(date += 1, std::out_of_range);
+        CHECK(date.GetDay() == 31);
+        CHECK(date.GetMonth() == Month::DECEMBER);
+        CHECK(date.GetYear() == 9999);
+    }
+    SECTION("-= leaves date unchanged on throw")
+    {
+        CDate date(1, Month::JANUARY, 1970);
+        CHECK_THROWS_AS(date -= 1, std::out_of_range);
+        CHECK(date.GetDay() == 1);
+        CHECK(date.GetMonth() == Month::JANUARY);
+        CHECK(date.GetYear() == 1970);
     }
 }
