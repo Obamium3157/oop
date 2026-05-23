@@ -106,3 +106,117 @@ TEST_CASE("FindMaxEx works with primitive int type", "[FindMaxEx][generic]")
     REQUIRE(found);
     CHECK(maxNumber == 9);
 }
+
+TEST_CASE("FindMaxEx finds max in negative int array", "[FindMaxEx][generic]")
+{
+    std::vector const numbers = {-5, -1, -3, -10, -2};
+    int maxNumber{};
+
+    bool const found = FindMaxEx(numbers, maxNumber, std::less<int>{});
+
+    REQUIRE(found);
+    CHECK(maxNumber == -1);
+}
+
+TEST_CASE("FindMaxEx finds max in single-element int array", "[FindMaxEx][generic]")
+{
+    std::vector const numbers = {42};
+    int maxNumber{};
+
+    bool const found = FindMaxEx(numbers, maxNumber, std::less<int>{});
+
+    REQUIRE(found);
+    CHECK(maxNumber == 42);
+}
+
+TEST_CASE("FindMaxEx returns false for empty int array", "[FindMaxEx][generic]")
+{
+    std::vector<int> const numbers;
+    int sentinel = -999;
+
+    bool const found = FindMaxEx(numbers, sentinel, std::less<int>{});
+
+    REQUIRE_FALSE(found);
+    CHECK(sentinel == -999);
+}
+
+TEST_CASE("FindMaxEx finds min in int array via reversed comparator", "[FindMaxEx][generic]")
+{
+    std::vector const numbers = {3, 1, 4, 1, 5, 9, 2, 6};
+    int minNumber{};
+
+    bool const found = FindMaxEx(numbers, minNumber, std::greater<int>{});
+
+    REQUIRE(found);
+    CHECK(minNumber == 1);
+}
+
+TEST_CASE("FindMaxEx finds max in double array", "[FindMaxEx][generic]")
+{
+    std::vector const values = {1.5, 3.14, 2.71, 0.577};
+    double maxValue{};
+
+    bool const found = FindMaxEx(values, maxValue, std::less<double>{});
+
+    REQUIRE(found);
+    CHECK(maxValue == Catch::Approx(3.14));
+}
+
+TEST_CASE("FindMaxEx finds lexicographically greatest string", "[FindMaxEx][string]")
+{
+    std::vector<std::string> const words = {"banana", "apple", "cherry", "date"};
+    std::string maxWord;
+
+    bool const found = FindMaxEx(words, maxWord, std::less<std::string>{});
+
+    REQUIRE(found);
+    CHECK(maxWord == "date");
+}
+
+TEST_CASE("FindMaxEx finds lexicographically smallest string via reversed comparator", "[FindMaxEx][string]")
+{
+    std::vector<std::string> const words = {"banana", "apple", "cherry", "date"};
+    std::string minWord;
+
+    bool const found = FindMaxEx(words, minWord, std::greater<std::string>{});
+
+    REQUIRE(found);
+    CHECK(minWord == "apple");
+}
+
+TEST_CASE("FindMaxEx finds longest string via length comparator", "[FindMaxEx][string]")
+{
+    std::vector<std::string> const words = {"cat", "elephant", "ox", "hippopotamus"};
+    std::string longest;
+
+    auto const shorterThan = [](std::string const& left, std::string const& right)
+    {
+        return left.size() < right.size();
+    };
+
+    bool const found = FindMaxEx(words, longest, shorterThan);
+
+    REQUIRE(found);
+    CHECK(longest == "hippopotamus");
+}
+
+TEST_CASE("FindMaxEx returns false for empty string array", "[FindMaxEx][string]")
+{
+    std::vector<std::string> const words;
+    std::string sentinel = "unchanged";
+
+    bool const found = FindMaxEx(words, sentinel, std::less<std::string>{});
+
+    REQUIRE_FALSE(found);
+    CHECK(sentinel == "unchanged");
+}
+
+TEST_CASE("FindMaxEx returns first element when all strings are equal", "[FindMaxEx][string]")
+{
+    std::vector<std::string> const words = {"same", "same", "same"};
+    std::string result;
+
+    FindMaxEx(words, result, std::less<std::string>{});
+
+    CHECK(result == "same");
+}
