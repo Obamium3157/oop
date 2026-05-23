@@ -282,6 +282,9 @@ TEST_CASE("Postfix ++", "[increment]")
     {
         CDate date(31, Month::DECEMBER, 9999);
         CHECK_THROWS_AS(date++, std::out_of_range);
+        REQUIRE(date.GetDay() == 31);
+        REQUIRE(date.GetMonth() == Month::DECEMBER);
+        REQUIRE(date.GetYear() == 9999);
     }
 }
 
@@ -313,6 +316,9 @@ TEST_CASE("Prefix --", "[decrement]")
     {
         CDate date(1, Month::JANUARY, 1970);
         CHECK_THROWS_AS(--date, std::out_of_range);
+        REQUIRE(date.GetDay() == 1);
+        REQUIRE(date.GetMonth() == Month::JANUARY);
+        REQUIRE(date.GetYear() == 1970);
     }
 }
 
@@ -340,6 +346,9 @@ TEST_CASE("Postfix --", "[decrement]")
     {
         CDate date(1, Month::JANUARY, 1970);
         CHECK_THROWS_AS(date--, std::out_of_range);
+        REQUIRE(date.GetDay() == 1);
+        REQUIRE(date.GetMonth() == Month::JANUARY);
+        REQUIRE(date.GetYear() == 1970);
     }
 }
 
