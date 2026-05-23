@@ -101,22 +101,24 @@ namespace
         return year;
     }
 
-    // TODO: придумать, как сделать без цикла
     std::pair<Month, unsigned> ExtractMonthAndDay(const unsigned timestamp)
     {
         const unsigned year = YearFromTimestamp(timestamp);
-        unsigned remaining = timestamp - DaysToStartOfYear(year);
+        const unsigned remaining = timestamp - DaysToStartOfYear(year);
+        const unsigned janFebDays = 31 + (IsLeapYear(year) ? 29 : 28);
 
-        for (unsigned i = 1; i <= 12; ++i)
-        {
-            const unsigned daysInCurrentMonth = DaysInMonth(static_cast<Month>(i), year);
-            if (remaining < daysInCurrentMonth)
-            {
-                return {static_cast<Month>(i), remaining + 1};
-            }
-            remaining -= daysInCurrentMonth;
-        }
-        return {Month::DECEMBER, 31};
+        constexpr unsigned daysFromMarch1ToDec31 = 306;
+        constexpr unsigned daysIn5Months = 153;
+
+        const unsigned doy = (remaining < janFebDays)
+                                 ? remaining + daysFromMarch1ToDec31
+                                 : remaining - janFebDays;
+
+        const unsigned mp = (5 * doy + 2) / daysIn5Months;
+        const unsigned day = doy - (daysIn5Months * mp + 2) / 5 + 1;
+        const unsigned month = (mp < 10) ? mp + 3 : mp - 9;
+
+        return {static_cast<Month>(month), day};
     }
 }
 
