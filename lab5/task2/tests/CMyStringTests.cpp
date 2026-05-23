@@ -315,6 +315,11 @@ TEST_CASE("SubString", "[substring]")
         REQUIRE(sub.GetStringData()[1] == '\0');
         REQUIRE(sub.GetStringData()[2] == 'b');
     }
+
+    SECTION("Negative value in SubString throws")
+    {
+        REQUIRE_THROWS_AS(str.SubString(-10, 3), std::out_of_range);
+    }
 }
 
 TEST_CASE("Copy assignment operator", "[assignment]")

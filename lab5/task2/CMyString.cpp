@@ -3,6 +3,18 @@
 #include <cstring>
 #include <stdexcept>
 
+namespace
+{
+    size_t RequireValidString(const char* pString)
+    {
+        if (pString == nullptr)
+        {
+            throw std::invalid_argument("CMyString: pString must be non-null");
+        }
+        return std::strlen(pString);
+    }
+}
+
 CMyString::CMyString()
     : m_data(s_emptyBuffer)
     , m_length(0)
@@ -11,18 +23,8 @@ CMyString::CMyString()
 }
 
 CMyString::CMyString(const char* pString)
-    : m_data(s_emptyBuffer)
-    , m_length(0)
-    , m_capacity(0)
+    : CMyString(pString, RequireValidString(pString))
 {
-    // TODO: эта строка много где дублируется
-    if (pString == nullptr)
-    {
-        throw std::invalid_argument("CMyString: pString must be non-null");
-    }
-
-    const size_t length = std::strlen(pString);
-    *this = CMyString(pString, length);
 }
 
 CMyString::CMyString(const char* pString, const size_t length)
@@ -30,11 +32,6 @@ CMyString::CMyString(const char* pString, const size_t length)
     , m_length(0)
     , m_capacity(0)
 {
-    if (pString == nullptr)
-    {
-        throw std::invalid_argument("CMyString: pString must be non-null");
-    }
-
     if (length == 0)
     {
         return;
@@ -44,7 +41,6 @@ CMyString::CMyString(const char* pString, const size_t length)
     m_length = length;
     m_capacity = length;
 
-    // TODO: посмотреть, кидает ли исключения
     std::memcpy(m_data, pString, length);
     m_data[length] = '\0';
 }
