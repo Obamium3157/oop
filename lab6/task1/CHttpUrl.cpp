@@ -1,6 +1,7 @@
 #include "CHttpUrl.h"
 
 #include <algorithm>
+#include <regex>
 
 #include "CUrlParsingError.h"
 
@@ -86,11 +87,15 @@ namespace
 
     std::string NormalizeDocument(std::string const& document)
     {
-        if (document.empty() || document[0] != '/')
+        if (document.empty())
+        {
+            return "/";
+        }
+
+        if (document[0] != '/' && document[0] != '?')
         {
             return '/' + document;
         }
-
         return document;
     }
 
@@ -103,74 +108,38 @@ namespace
     {
         return port == GetDefaultPort(protocol);
     }
-
-    size_t FindSchemeEnd(std::string const& url)
-    {
-        const size_t schemeEnd = url.find("://");
-        if (schemeEnd == std::string::npos)
-        {
-            throw CUrlParsingError("Missing '://' separator in URL");
-        }
-        return schemeEnd;
-    }
-
-    size_t FindPathStart(std::string const& url, const size_t authorityStart)
-    {
-        if (authorityStart >= url.size())
-        {
-            throw CUrlParsingError("Missing host in URL");
-        }
-        return url.find('/', authorityStart);
-    }
-
-    std::string ExtractAuthority(std::string const& url, const size_t authorityStart, const size_t pathStart)
-    {
-        return (pathStart == std::string::npos)
-                   ? url.substr(authorityStart)
-                   : url.substr(authorityStart, pathStart - authorityStart);
-    }
-
-    std::string ParseDomain(std::string const& authority)
-    {
-        const size_t colonPos = authority.find(':');
-        const std::string domain = (colonPos == std::string::npos)
-                                       ? authority
-                                       : authority.substr(0, colonPos);
-        try
-        {
-            ValidateDomain(domain);
-        }
-        catch (std::invalid_argument const& e)
-        {
-            throw CUrlParsingError(e.what());
-        }
-        return domain;
-    }
-
-    unsigned short ParsePortFromAuthority(std::string const& authority, const Protocol protocol)
-    {
-        const size_t colonPos = authority.find(':');
-        if (colonPos == std::string::npos)
-        {
-            return GetDefaultPort(protocol);
-        }
-        return ParsePort(authority.substr(colonPos + 1));
-    }
 }
 
-CHttpUrl::CHttpUrl(std::string const& url)
+CHttpUrl::CHttpUrl(const std::string& url)
 {
-    const std::string schemeSeparator = "://";
-    const size_t schemeEnd = FindSchemeEnd(url);
-    m_protocol = ParseProtocol(url.substr(0, schemeEnd));
+    static const std::regex urlPattern(
+        R"(([a-zA-Z]+)://([^/:?]+)(?::(\d+))?([/?].*)?)"
+    );
 
-    const size_t authorityStart = schemeEnd + schemeSeparator.size();
-    const size_t pathStart = FindPathStart(url, authorityStart);
-    const std::string authority = ExtractAuthority(url, authorityStart, pathStart);
+    std::smatch match;
+    if (!std::regex_match(url, match, urlPattern))
+    {
+        throw CUrlParsingError("Invalid URL format: " + url);
+    }
 
-    m_domain = ParseDomain(authority);
-    m_port = ParsePortFromAuthority(authority, m_protocol);
-    m_document = (pathStart == std::string::npos) ? "/" : url.substr(pathStart);
+    m_protocol = ParseProtocol(match[1].str());
+
+    const std::string domain = match[2].str();
+    try
+    {
+        ValidateDomain(domain);
+    }
+    catch (std::invalid_argument const& e)
+    {
+        throw CUrlParsingError(e.what());
+    }
+    m_domain = domain;
+
+    const std::string portStr = match[3].str();
+    m_port = portStr.empty() ? GetDefaultPort(m_protocol) : ParsePort(portStr);
+
+    const std::string document = match[4].str();
+    m_document = document.empty() ? "/" : document;
 }
 
 CHttpUrl::CHttpUrl(
