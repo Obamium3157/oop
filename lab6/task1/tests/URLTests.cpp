@@ -147,6 +147,18 @@ TEST_CASE("String constructor (document parsing)", "[constructor]")
         CHttpUrl url("http://example.com/search?q=test");
         REQUIRE(url.GetDocument() == "/search?q=test");
     }
+
+    SECTION("Domain is not contaminated by query string characters")
+    {
+        CHttpUrl url("http://example.com?q=test");
+        REQUIRE(url.GetDomain() == "example.com");
+    }
+
+    SECTION("Document starting with ? does not include /")
+    {
+        CHttpUrl url("example.com", "?q=test", Protocol::HTTP);
+        REQUIRE(url.GetDocument() == "?q=test");
+    }
 }
 
 TEST_CASE("Parametric constructor (domain validation)", "[constructor]")
@@ -269,4 +281,15 @@ TEST_CASE("Getters return correct values after string constructor")
     REQUIRE(url.GetPort() == 8443);
     REQUIRE(url.GetDocument() == "/path/to/doc.html");
     REQUIRE(url.GetURL() == "https://sub.example.com:8443/path/to/doc.html");
+}
+
+TEST_CASE("Getters return correct values for URL with nested URL in query string")
+{
+    CHttpUrl url("https://example.com?url=localhost.ru:1111/doc.html");
+
+    REQUIRE(url.GetProtocol() == Protocol::HTTPS);
+    REQUIRE(url.GetDomain() == "example.com");
+    REQUIRE(url.GetPort() == 443);
+    REQUIRE(url.GetDocument() == "?url=localhost.ru:1111/doc.html");
+    REQUIRE(url.GetURL() == "https://example.com?url=localhost.ru:1111/doc.html");
 }
