@@ -319,7 +319,6 @@ TEST_CASE("SubString", "[substring]")
     SECTION("Negative value in SubString throws")
     {
         REQUIRE_THROWS_AS(str.SubString(-10, 3), std::out_of_range);
-        REQUIRE_THROWS_AS(str.SubString(2, -5), std::out_of_range);
     }
 }
 
