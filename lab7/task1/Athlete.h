@@ -1,5 +1,6 @@
 #ifndef OOP_ATHLETE_H
 #define OOP_ATHLETE_H
+
 #include <iostream>
 #include <string>
 
@@ -12,7 +13,7 @@ struct Athlete
 
 struct LessByHeight
 {
-    bool operator()(Athlete const& left, Athlete const& right) const
+    bool operator()(const Athlete& left, const Athlete& right) const noexcept
     {
         return left.heightCm < right.heightCm;
     }
@@ -20,13 +21,13 @@ struct LessByHeight
 
 struct LessByWeight
 {
-    bool operator()(Athlete const& left, Athlete const& right) const
+    bool operator()(const Athlete& left, const Athlete& right) const noexcept
     {
         return left.weightKg < right.weightKg;
     }
 };
 
-inline void PrintAthlete(std::string const& label, Athlete const& athlete)
+inline void PrintAthlete(const std::string& label, const Athlete& athlete)
 {
     std::cout << label << "\n"
         << "  ФИО:  " << athlete.fullName << "\n"

@@ -3,25 +3,31 @@
 
 #include <vector>
 
-template <typename T, typename Less>
-bool FindMaxEx(std::vector<T> const& arr, T& maxValue, Less const& less)
+template <typename Less, typename T>
+concept NoexceptComparator = requires(const Less& less, const T& lhs, const T& rhs)
 {
-    if (arr.empty())
+    { less(lhs, rhs) } noexcept -> std::convertible_to<bool>;
+};
+
+template <typename Iter, NoexceptComparator<typename std::iterator_traits<Iter>::value_type> Less>
+bool FindMaxEx(const Iter& first, const Iter& last, typename std::iterator_traits<Iter>::value_type& maxValue,
+               const Less& less)
+{
+    if (first == last)
     {
         return false;
     }
 
-    T const* bestCandidate = &arr[0];
-
-    for (std::size_t index = 1; index < arr.size(); ++index)
+    auto bestCandidate = *first;
+    for (auto it = std::next(first); it != last; ++it)
     {
-        if (less(*bestCandidate, arr[index]))
+        if (less(bestCandidate, *it))
         {
-            bestCandidate = &arr[index];
+            bestCandidate = *it;
         }
     }
 
-    maxValue = *bestCandidate;
+    maxValue = bestCandidate;
     return true;
 }
 
