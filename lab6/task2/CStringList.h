@@ -12,7 +12,7 @@ class CStringList
         Node* next = nullptr;
 
         Node() = default;
-        explicit Node(std::string val);
+        explicit Node(const std::string& val);
     };
 
 public:
