@@ -240,7 +240,7 @@ private:
         }
     }
 
-    void ThrowIfOutOfRange(size_t index) const
+    void ThrowIfOutOfRange(const size_t index) const
     {
         if (index >= m_size)
         {
