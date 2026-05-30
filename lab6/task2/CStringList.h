@@ -1,7 +1,9 @@
 #ifndef OOP_CSTRINGLIST_H
 #define OOP_CSTRINGLIST_H
-#include <string>
 
+#include <cstddef>
+#include <iterator>
+#include <string>
 
 class CStringList
 {
@@ -12,7 +14,7 @@ class CStringList
         Node* next = nullptr;
 
         Node() = default;
-        explicit Node(const std::string& val);
+        explicit Node(std::string val);
     };
 
 public:
