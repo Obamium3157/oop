@@ -1,6 +1,10 @@
 #include <iostream>
 
+#include "CStringList.h"
+
 int main()
 {
-    std::cout << "Hello, world!\n";
+    CStringList list;
+    auto it = list.begin();
+    std::cout << *it << std::endl;
 }

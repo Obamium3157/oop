@@ -92,9 +92,9 @@ public:
     void PushBack(std::string&& value);
     void PushFront(const std::string& value);
     void PushFront(std::string&& value);
-    Iterator Insert(ConstIterator pos, const std::string& value);
-    Iterator Insert(ConstIterator pos, std::string&& value);
-    Iterator Erase(ConstIterator pos);
+    ConstIterator Insert(ConstIterator pos, const std::string& value);
+    ConstIterator Insert(ConstIterator pos, std::string&& value);
+    ConstIterator Erase(ConstIterator pos);
     void Clear() noexcept;
     void Swap(CStringList& other) noexcept;
 

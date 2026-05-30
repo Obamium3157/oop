@@ -185,7 +185,7 @@ void CStringList::UnlinkNode(Node* node) noexcept
     node->next->prev = node->prev;
 }
 
-CStringList::Iterator CStringList::Insert(const ConstIterator pos, const std::string& value)
+CStringList::ConstIterator CStringList::Insert(const ConstIterator pos, const std::string& value)
 {
     auto newNode = std::make_unique<Node>(value);
     InsertNodeBefore(pos.m_node, newNode.get());
@@ -193,7 +193,7 @@ CStringList::Iterator CStringList::Insert(const ConstIterator pos, const std::st
     return Iterator(newNode.release());
 }
 
-CStringList::Iterator CStringList::Insert(const ConstIterator pos, std::string&& value)
+CStringList::ConstIterator CStringList::Insert(const ConstIterator pos, std::string&& value)
 {
     auto newNode = std::make_unique<Node>(std::move(value));
     InsertNodeBefore(pos.m_node, newNode.get());
@@ -201,7 +201,7 @@ CStringList::Iterator CStringList::Insert(const ConstIterator pos, std::string&&
     return Iterator(newNode.release());
 }
 
-CStringList::Iterator CStringList::Erase(const ConstIterator pos)
+CStringList::ConstIterator CStringList::Erase(const ConstIterator pos)
 {
     Node* nodeToErase = pos.m_node;
     Node* nextNode = nodeToErase->next;
