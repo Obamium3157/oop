@@ -215,7 +215,7 @@ private:
         {
             while (m_size < other.m_size)
             {
-                new (m_buffer.data + m_size) T(other.m_buffer.data[m_size]);;
+                new (m_buffer.data + m_size) T(other.m_buffer.data[m_size]);
                 ++m_size;
             }
         }

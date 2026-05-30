@@ -119,6 +119,8 @@ private:
     void InsertNodeBefore(Node* pos, Node* newNode) noexcept;
     void UnlinkNode(Node* node) noexcept;
 
+
+    // TODO: unique_ptr
     Node* m_sentinel = nullptr;
     size_t m_size = 0;
 };

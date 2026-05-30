@@ -7,6 +7,8 @@
 #include <type_traits>
 #include <vector>
 
+// TODO: больше тестов
+
 namespace
 {
     CStringList MakeList(const std::initializer_list<std::string> values)
@@ -60,6 +62,7 @@ TEST_CASE("PushBack appends elements to the end", "[modifier]")
         std::string s = "moved";
         list.PushBack(std::move(s));
         REQUIRE(*list.begin() == "moved");
+        // TODO: check if s empty
     }
 
     SECTION("Empty string is valid value")
@@ -68,6 +71,8 @@ TEST_CASE("PushBack appends elements to the end", "[modifier]")
         REQUIRE(list.GetSize() == 1);
         REQUIRE(*list.begin() == "");
     }
+
+    // TODO: PushBack after Erase (PushBack -> Erase -> PushBach
 }
 
 
@@ -651,6 +656,19 @@ TEST_CASE("GetSize is consistent with actual element count", "[modifier]")
 
     list.Clear();
     REQUIRE(list.GetSize() == static_cast<size_t>(std::distance(list.begin(), list.end())));
+}
+
+// TODO: изучить, в чем тут проблема
+void doStuff()
+{
+    auto sl = new CStringList();
+
+    // do some stuff
+    CStringList csl;
+
+    // do other stuff
+
+    return void;
 }
 
 TEST_CASE("Destructor handles large list without stack overflow", "[large]")
