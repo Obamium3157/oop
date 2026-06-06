@@ -12,7 +12,7 @@ classDiagram
     class ICanvas {
         <<interface>>
         + DrawLine(from: CPoint, to: CPoint, lineColor: uint32_t): void
-        + FillPolygon(points: vector<CPoint>, fillColor: uint32_t): void
+        + FillPolygon(points: vector~CPoint~, fillColor: uint32_t): void
         + DrawCircle(center: CPoint, radius: double, lineColor: uint32_t): void
         + FillCircle(center: CPoint, radius: double, fillColor: uint32_t): void
     }
@@ -20,7 +20,7 @@ classDiagram
     class CCanvas {
         - m_window: RenderWindow&
         + DrawLine(from: CPoint, to: CPoint, lineColor: uint32_t): void
-        + FillPolygon(points: vector<CPoint>, fillColor: uint32_t): void
+        + FillPolygon(points: vector~CPoint~, fillColor: uint32_t): void
         + DrawCircle(center: CPoint, radius: double, lineColor: uint32_t): void
         + FillCircle(center: CPoint, radius: double, fillColor: uint32_t): void
     }
@@ -85,7 +85,7 @@ classDiagram
     }
 
     class GeometryHandler {
-        - m_shapes: vector<unique_ptr<IShape>>
+        - m_shapes: vector~unique_ptr~IShape~~
         + ReadShapes(input: istream): void
         + PrintResults(output: ostream): void
         + Draw(canvas: ICanvas): void

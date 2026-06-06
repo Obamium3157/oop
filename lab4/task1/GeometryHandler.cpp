@@ -124,7 +124,7 @@ void GeometryHandler::ReadShapes(std::istream& input)
     std::string shapeType;
     while (input >> shapeType)
     {
-        if (shapeType == "\x1a" || shapeType == "^Z")
+        if (shapeType == "^Z")
         {
             break;
         }
