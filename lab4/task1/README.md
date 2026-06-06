@@ -4,6 +4,32 @@
 
 ```mermaid
 classDiagram
+    class ICanvasDrawable {
+        <<interface>>
+        + Draw(canvas: ICanvas&): void
+    }
+
+    class ICanvas {
+        <<interface>>
+        + DrawLine(from: CPoint, to: CPoint, lineColor: uint32_t): void
+        + FillPolygon(points: vector<CPoint>, fillColor: uint32_t): void
+        + DrawCircle(center: CPoint, radius: double, lineColor: uint32_t): void
+        + FillCircle(center: CPoint, radius: double, fillColor: uint32_t): void
+    }
+
+    class CCanvas {
+        - m_window: RenderWindow&
+        + DrawLine(from: CPoint, to: CPoint, lineColor: uint32_t): void
+        + FillPolygon(points: vector<CPoint>, fillColor: uint32_t): void
+        + DrawCircle(center: CPoint, radius: double, lineColor: uint32_t): void
+        + FillCircle(center: CPoint, radius: double, fillColor: uint32_t): void
+    }
+
+    class CPoint {
+        + x: double
+        + y: double
+    }
+
     class IShape {
         <<interface>>
         + GetArea(): double
@@ -17,37 +43,32 @@ classDiagram
         + GetFillColor(): uint32_t
     }
 
-    class CPoint {
-        + x: double
-        + y: double
-    }
-
     class CLineSegment {
-        + GetArea(): double
-        + GetPerimeter(): double
-        + ToString(): string
+        - m_startPoint: CPoint
+        - m_endPoint: CPoint
+        - m_outlineColor: uint32_t
         + GetOutlineColor(): uint32_t
         + GetStartPoint(): CPoint
         + GetEndPoint(): CPoint
     }
 
     class CTriangle {
-        + GetArea(): double
-        + GetPerimeter(): double
-        + ToString(): string
-        + GetOutlineColor(): uint32_t
-        + GetFillColor(): uint32_t
+        - m_vertex1: CPoint
+        - m_vertex2: CPoint
+        - m_vertex3: CPoint
+        - m_outlineColor: uint32_t
+        - m_fillColor: uint32_t
         + GetVertex1(): CPoint
         + GetVertex2(): CPoint
         + GetVertex3(): CPoint
     }
 
     class CRectangle {
-        + GetArea(): double
-        + GetPerimeter(): double
-        + ToString(): string
-        + GetOutlineColor(): uint32_t
-        + GetFillColor(): uint32_t
+        - m_leftTop: CPoint
+        - m_width: double
+        - m_height: double
+        - m_outlineColor: uint32_t
+        - m_fillColor: uint32_t
         + GetLeftTop(): CPoint
         + GetRightBottom(): CPoint
         + GetWidth(): double
@@ -55,20 +76,30 @@ classDiagram
     }
 
     class CCircle {
-        + GetArea(): double
-        + GetPerimeter(): double
-        + ToString(): string
-        + GetOutlineColor(): uint32_t
-        + GetFillColor(): uint32_t
-        + GetCenter(): CPoint
-        + GetRadius(): double
+        -m_center: CPoint
+        -m_radius: double
+        -m_outlineColor: uint32_t
+        -m_fillColor: uint32_t
+        +GetCenter(): CPoint
+        +GetRadius(): double
     }
 
+    class GeometryHandler {
+        - m_shapes: vector<unique_ptr<IShape>>
+        + ReadShapes(input: istream): void
+        + PrintResults(output: ostream): void
+        + Draw(canvas: ICanvas): void
+    }
+
+    ICanvasDrawable <|-- IShape
+    IShape <|-- ISolidShape
     IShape <|.. CLineSegment
-    IShape <|.. ISolidShape
     ISolidShape <|.. CTriangle
     ISolidShape <|.. CRectangle
     ISolidShape <|.. CCircle
+    ICanvas <|.. CCanvas
+    GeometryHandler *-- IShape
+    GeometryHandler ..> ICanvas
 ```
 
 С их использованием разработайте программу, считывающую информацию из стандартного потока ввода команды, описывающие
