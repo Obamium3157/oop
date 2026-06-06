@@ -1,6 +1,7 @@
 #include "CLineSegment.h"
 
 #include <iomanip>
+#include <cmath>
 
 #include "ColorUtils.h"
 
@@ -19,7 +20,9 @@ double CLineSegment::GetArea() const
 
 double CLineSegment::GetPerimeter() const
 {
-    return 0.0;
+    const double dx = m_endPoint.x - m_startPoint.x;
+    const double dy = m_endPoint.y - m_startPoint.y;
+    return std::sqrt(dx * dx + dy * dy);
 }
 
 std::string CLineSegment::ToString() const
@@ -29,6 +32,7 @@ std::string CLineSegment::ToString() const
     stream << "Line Segment\n";
     stream << "  Start: (" << m_startPoint.x << ", " << m_startPoint.y << ")\n";
     stream << "  End: (" << m_endPoint.x << ", " << m_endPoint.y << ")\n";
+    stream << "  Perimeter: " << GetPerimeter() << "\n";
     stream << "  Outline: " << FormatColor(m_outlineColor);
     return stream.str();
 }
