@@ -1,15 +1,11 @@
 #include <iostream>
 
-#include "BodyCollection.h"
-#include "ConsoleHandler.h"
+#include "GeometryHandler.h"
 
 int main()
 {
-    BodyCollection collection;
-    ConsoleHandler handler(std::cin, std::cout);
-
-    handler.FillCollection(collection);
-    handler.PrintResults(collection);
-
+    GeometryHandler handler;
+    handler.ReadShapes(std::cin);
+    handler.PrintResults(std::cout);
     return 0;
 }
