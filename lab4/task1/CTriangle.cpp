@@ -55,6 +55,14 @@ std::string CTriangle::ToString() const
     return stream.str();
 }
 
+void CTriangle::Draw(ICanvas& canvas) const
+{
+    canvas.FillPolygon({ m_vertex1, m_vertex2, m_vertex3 }, m_fillColor);
+    canvas.DrawLine(m_vertex1, m_vertex2, m_outlineColor);
+    canvas.DrawLine(m_vertex2, m_vertex3, m_outlineColor);
+    canvas.DrawLine(m_vertex3, m_vertex1, m_outlineColor);
+}
+
 uint32_t CTriangle::GetOutlineColor() const
 {
     return m_outlineColor;

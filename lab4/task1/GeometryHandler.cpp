@@ -12,6 +12,7 @@
 
 #include "ColorUtils.h"
 #include "FindMaxEx.h"
+#include "ICanvas.h"
 
 namespace
 {
@@ -154,6 +155,14 @@ void GeometryHandler::PrintResults(std::ostream& output) const
     output << "Shape with minimum perimeter:\n";
     PrintShapeInfo(output, *FindShapeWithMinPerimeter());
     output << "\n";
+}
+
+void GeometryHandler::Draw(ICanvas& canvas) const
+{
+    for (const auto& shape : m_shapes)
+    {
+        shape->Draw(canvas);
+    }
 }
 
 void GeometryHandler::PrintShapeInfo(std::ostream& output, const IShape& shape)

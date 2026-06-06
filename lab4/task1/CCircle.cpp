@@ -38,6 +38,12 @@ std::string CCircle::ToString() const
     return stream.str();
 }
 
+void CCircle::Draw(ICanvas& canvas) const
+{
+    canvas.FillCircle(m_center, m_radius, m_fillColor);
+    canvas.DrawCircle(m_center, m_radius, m_outlineColor);
+}
+
 uint32_t CCircle::GetOutlineColor() const
 {
     return m_outlineColor;

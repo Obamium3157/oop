@@ -12,6 +12,7 @@ class GeometryHandler
 public:
     void ReadShapes(std::istream& input);
     void PrintResults(std::ostream& output) const;
+    void Draw(ICanvas& canvas) const;
 
 private:
     const IShape* FindShapeWithMaxArea() const;

@@ -42,6 +42,19 @@ std::string CRectangle::ToString() const
     return stream.str();
 }
 
+void CRectangle::Draw(ICanvas& canvas) const
+{
+    CPoint rightBottom = GetRightBottom();
+    CPoint rightTop = { rightBottom.x, m_leftTop.y };
+    CPoint leftBottom = { m_leftTop.x, rightBottom.y };
+
+    canvas.FillPolygon({ m_leftTop, rightTop, rightBottom, leftBottom }, m_fillColor);
+    canvas.DrawLine(m_leftTop, rightTop, m_outlineColor);
+    canvas.DrawLine(rightTop, rightBottom, m_outlineColor);
+    canvas.DrawLine(rightBottom, leftBottom, m_outlineColor);
+    canvas.DrawLine(leftBottom, m_leftTop, m_outlineColor);
+}
+
 uint32_t CRectangle::GetOutlineColor() const
 {
     return m_outlineColor;
