@@ -32,12 +32,6 @@ TEST_CASE("Perimeter is Euclidean distance between endpoints", "[CLineSegment]")
         REQUIRE(line.GetPerimeter() == Approx(7.0));
     }
 
-    SECTION("3-4-5 diagonal")
-    {
-        CLineSegment line({ 0.0, 0.0 }, { 3.0, 4.0 }, 0);
-        REQUIRE(line.GetPerimeter() == Approx(5.0));
-    }
-
     SECTION("endpoints with negative coordinates")
     {
         CLineSegment line({ -3.0, -4.0 }, { 0.0, 0.0 }, 0);

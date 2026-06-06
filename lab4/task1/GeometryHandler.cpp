@@ -191,10 +191,3 @@ const IShape* GeometryHandler::FindShapeWithMinPerimeter() const
     });
     return it != m_shapes.end() ? it->get() : nullptr;
 }
-
-/*
-rectangle 10.3 20.15 30.7 40.4 ff0000 00ff00
-triangle 0 0 0 10 100 50 ffffff bbbbbb
-line 10 10 200 200 123321
-circle 50 50 12.31 fff000 000fff
-*/
